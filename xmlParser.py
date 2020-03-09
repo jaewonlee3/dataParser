@@ -1,7 +1,7 @@
 from lxml import etree
 from io import StringIO
 
-ns = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+ns = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance',! [rejected]        master -> master (fetch first)
       'resource': 'http://www.tmaxsoft.com/top/SNAPSHOT/resource'}
 
 tree = etree.parse("/Users/이재원/Documents/code/a.xml")
