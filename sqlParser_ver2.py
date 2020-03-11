@@ -6,12 +6,21 @@ class RecursiveTokenParser(object):
  def __init__(self, query):
     self.query = query
     self.names = []
+    self.elements = sqlparse.parse(self.query)
+    self.stmt = self.elements[0]
+ def extractColumn(self):
+     query_type = self.stmt.get_type()
+     if self.stmt.get_type() == 'INSERT' :
+         print("insert query")
+         return self.insert_query()
+     else :
+        if self.stmt.get_type() == 'SELECT' :
+            print("select query")
 
- def get_table_names(self):
-    elements = sqlparse.parse(self.query)
-    print(elements[0].tokens)
-    for token in elements[0].tokens:
-
+ def insert_query(self):
+    #elements = sqlparse.parse(self.query)
+    #print(elements[0].tokens)
+    for token in self.stmt.tokens:
         if isinstance(token, Identifier):
             self.identifier(token)
         elif isinstance(token, IdentifierList):
@@ -19,7 +28,6 @@ class RecursiveTokenParser(object):
             self.identifier(token)
         elif isinstance(token, Parenthesis):
             self.parenthesis(token)
-
         elif isinstance(token, Where):
             self.where(token)
 
@@ -53,9 +61,11 @@ class RecursiveTokenParser(object):
  def get_query(self):  #
     return self.query
 
-
-sql2 = "SELECT a FROM CITY WHERE a = (SELECT e FROM  Country)"
-t = RecursiveTokenParser(sql2)
-
-print(t.get_query())
-print(t.get_table_names())
+sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7)"
+sqlSelect = "SELECT a FROM CITY WHERE a = (SELECT e FROM  Country)"
+insertTest = RecursiveTokenParser(sqlInsert)
+selectTest = RecursiveTokenParser(sqlSelect)
+print(insertTest.extractColumn())
+print(selectTest.extractColumn())
+#print(t.get_query())
+#print(t.insert_query())
