@@ -1,0 +1,116 @@
+Metadata-Version: 2.1
+Name: pprintjson
+Version: 1.4.1
+Summary: A json pretty printer for python
+Home-page: https://github.com/clarketm/pprintjson
+Author: Travis Clarke
+Author-email: travis.m.clarke@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pygments (>=1.6)
+Provides-Extra: simplejson
+Requires-Dist: simplejson (>=2.0.9) ; extra == 'simplejson'
+
+# [pprintjson](https://pprintjson.readthedocs.io/en/latest/)
+
+[![PyPi release](https://img.shields.io/pypi/v/pprintjson.svg)](https://pypi.org/project/pprintjson/)
+[![Downloads](https://pepy.tech/badge/pprintjson)](https://pepy.tech/project/pprintjson)
+[![Documentation Status](https://readthedocs.org/projects/pprintjson/badge/?version=latest)](https://pprintjson.readthedocs.io/en/latest/?badge=latest)
+
+A json pretty printer for Python 🐍.
+
+[Check out the pprintjson docs](https://pprintjson.readthedocs.io/en/latest/)
+
+## Installation
+
+Install with the standard [`json`](https://docs.python.org/3/library/json.html) JSON encoder
+
+```bash
+$ pip install pprintjson
+```
+
+Install with the premier [`simplejson`](https://simplejson.readthedocs.io/en/latest/) JSON encoder
+```bash
+$ pip install pprintjson[simplejson]
+```
+
+## Usage
+
+```text
+
+usage: pprintjson.py [-h] [-i num] [-o file] [-c cmd] [-v] [file]
+
+A pretty-printing function for json.
+
+positional arguments:
+  file                    json <file> to pretty-print
+
+optional arguments:
+  -h, --help              show this help message and exit
+  -i num, --indent num    indent <num> number of spaces at each level (default: 4)
+  -o file, --output file  write output to <file> instead of stdout (default: stdout)
+  -c cmd, --command cmd   json <cmd> to pretty-print
+  -v, --version           show program's version number and exit
+
+```
+
+### Script
+
+Pretty print JSON from a **file** using the `pprintjson` CLI.
+
+```bash
+$ pprintjson "./path/to/file.json"
+```
+
+Pretty print JSON from a **stdin** using the `pprintjson` CLI.
+
+```bash
+$ echo '{ "a": 1, "b": "string", "c": true }' | pprintjson
+```
+
+Pretty print JSON from a **string** using the `pprintjson` CLI.
+
+```bash
+$ pprintjson -c '{ "a": 1, "b": "string", "c": true }'
+```
+
+Pretty print JSON from a **string** with an *indent* of **1**.
+
+```bash
+$ pprintjson -c '{ "a": 1, "b": "string", "c": true }' -i 1
+```
+
+Pretty print JSON from a **string** and save *output* to a file **output.json**.
+
+```bash
+$ pprintjson -c '{ "a": 1, "b": "string", "c": true }' -o ./output.json
+```
+
+### Module
+
+Pretty print JSON from a **dict** using the `pprintjson` module.
+
+```python
+
+# 1. import the "pprintjson" function.
+from pprintjson import pprintjson as ppjson
+
+# 2. pretty print JSON.
+obj = { "a": 1, "b": "string", "c": True }
+
+ppjson(obj)
+```
+
+![stdout](https://raw.githubusercontent.com/clarketm/pprintjson/master/pprintjson.png)
+
+## License
+
+MIT &copy; [**Travis Clarke**](https://blog.travismclarke.com/)
+
+
