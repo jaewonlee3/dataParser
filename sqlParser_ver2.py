@@ -1,3 +1,5 @@
+## -*- coding: UTF-8 -*-
+
 import sqlparse
 from sqlparse.sql import Where, Comparison, Parenthesis, Identifier, IdentifierList
 from array import *
@@ -9,20 +11,15 @@ class RecursiveTokenParser(object):
         self.elements = sqlparse.parse(self.query)
         self.stmt = self.elements[0]
         self.info = []
-        #token 안에 존재하는 whitespace (빈칸) 정리
-        for token in self.stmt.tokens:
-            if token.is_whitespace:
-                self.stmt.tokens.pop(self.stmt.tokens.index(token))
-                if isinstance(token, (Parenthesis, Comparison, Where)):
-                    for subtoken in token.tokens:
-                        if subtoken.is_whitespace:
-                            subtokenIndex = token.tokens.index(subtoken)
-                            token.tokens.pop(subtokenIndex)
+        self.parsedToken = []
+
+
+
     def extractColumn(self):
          query_type = self.stmt.get_type()
          if query_type == 'INSERT' :
              print("This SQL is a INSERT DML")
-             return self.insert_query()
+             return self.insert_query_2()
          elif query_type == 'SELECT':
              print("This SQL is a SELECT DML")
              return self.select_query()
@@ -32,33 +29,39 @@ class RecursiveTokenParser(object):
 
 
     #insert쿼리문 처리
+    def insert_query_2(self):
+        for token in self.stmt.tokens:
+            self.parseToken(token)
+        self.tokenReport(self.stmt.get_type)
+
+    def tokenReport(self, DML):
+        if DML == "INSERT":
+            print(hello)
     def insert_query(self):
         #elements = sqlparse.parse(self.query)
         #print(elements[0].tokens)
         for token in self.stmt.tokens:
+            self.parseToken(token)
             if isinstance(token, Identifier):
                 self.identifier(token)
             elif isinstance(token, IdentifierList):
                 self.identifier(token)
         for name in self.names:
-            # print(name)
-            if str(name) == '.':
-                periodIndex =  self.names.index(name)
-                schemaName = str(self.names[periodIndex-1])
-                tableString = str(self.names[periodIndex+1])
-                tableString = tableString.replace(")","")
-        tableInfo = tableString.split("(")
-        tableName = tableString.split("(")[0]
-        tableColumns = tableString.split("(")[1].split(",")
+            schemaName = str(name).split(".")[0]
+            tableName = str(name).split(".")[1].split("(")[0]
+            tableColumns = str(name).split(".")[1].split("(")[1]
+            tableColumns = tableColumns.replace(" ","")
+            tableColumns = tableColumns.replace(")","")
+            tableColumns = tableColumns.split(",")
         for tableColumn in tableColumns:
             self.info.append([schemaName, tableName, tableColumn])
-
         return self.info
 
 
     def update_query(self):
+        print(self.stmt.tokens)
         for token in self.stmt.tokens:
-            # print(str(token)+": "+str(token.ttype))
+            print(str(token)+": "+str(token.ttype))
             if isinstance(token, Identifier):
                 self.identifier(token)
             elif isinstance(token, IdentifierList):
@@ -67,14 +70,16 @@ class RecursiveTokenParser(object):
                 self.parenthesis(token)
             elif isinstance(token, Where):
                 self.where(token)
-        for name in self.names:
-            print(name)
-            if str(name) == '.':
-                periodIndex =  self.names.index(name)
-                schemaName = str(self.names[periodIndex-1])
-                tableName = str(self.names[periodIndex+1])
-        print(schemaName)
-        print(tableName)
+        # print([str(name).upper() for name in self.names])
+
+    #     for name in self.names:
+    #         print(name)
+    #         if str(name) == '.':
+    #             periodIndex =  self.names.index(name)
+    #             schemaName = str(self.names[periodIndex-1])
+    #             tableName = str(self.names[periodIndex+1])
+    #     print(schemaName)
+    #     print(tableName)
 
         # tableInfo = tableString.split("(")
         # tableName = tableString.split("(")[0]
@@ -94,6 +99,18 @@ class RecursiveTokenParser(object):
             elif isinstance(token, Where):
                 self.where(token)
         return [str(name).upper() for name in self.names]
+
+
+
+    #모든 토큰을 Recursive하게 찾음
+    def parseToken(self, token):
+            if hasattr(token, 'tokens'):
+                for subtoken in token.tokens:
+                    if subtoken.is_whitespace == False and hasattr(subtoken, 'tokens') == False:
+                        self.parsedToken.append(str(subtoken))
+                    self.parseToken(subtoken)
+
+
 
     def where(self, token):
         for subtoken in token.tokens:
@@ -126,8 +143,9 @@ class RecursiveTokenParser(object):
 
 
     def identifier(self, token):
-        for subtoken in token.tokens:
-            self.names.append(subtoken)
+        self.names.append(token)
+        # for subtoken in token.tokens:
+        #     self.names.append(subtoken)
 
     def identifierList(self, token):
         for subtoken in token.tokens:
@@ -143,7 +161,8 @@ it = RecursiveTokenParser(sqlInsert)
 ut = RecursiveTokenParser(sqlUpdate)
 #st = RecursiveTokenParser(sqlSelect)
 print(it.extractColumn())
-print(ut.extractColumn())
+# print(ut.extractColumn())
+print(it.parsedToken)
 #print(st.extractColumn())
 #print(t.get_query())
 #print(t.insert_query())
