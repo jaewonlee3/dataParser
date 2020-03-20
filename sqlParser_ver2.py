@@ -55,9 +55,28 @@ class RecursiveTokenParser(object):
                     self.info.append([schemaName,tableName,token])
             return self.info
 
-        if query_type == "DELETE" :
+        if query_type == "DELETE":
             print("DELETE QUERY")
-            print("delete query area")
+            schemaName = self.parsedToken[1]
+            tableName = self.parsedToken[3]
+            whereCount = 0
+            aftercomparison = 0
+            for token in self.parsedToken[4:]:
+                if token == "." or token == "," or aftercomparison == "1" or token == "AND":
+                    aftercomparison = 0
+                    continue
+                elif token == "WHERE":
+                    whereCount = 1
+                    continue
+                elif token == "=":
+                    aftercomparison = "1"
+                    continue
+                if whereCount == 1 and token == "(":
+                    print("subquery area")
+                else:
+                    self.info.append([schemaName,tableName,token])
+                    whereCount = 0
+        return self.info
         if query_type == "SELECT" :
             print("SELECT QUERY")
             print("select query area")
@@ -79,7 +98,7 @@ class RecursiveTokenParser(object):
             self.parsedToken.append(str(token))
             # else: self.parsedToken.append(str(token))
         #insert쿼리문 처리
-        ## OLD VERSION
+        # # OLD VERSION
         # def insert_query(self):
         #     #elements = sqlparse.parse(self.query)
         #     #print(elements[0].tokens)
@@ -196,15 +215,19 @@ class RecursiveTokenParser(object):
 sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7);"
 sqlSelect = "SELECT c.A FROM CITY as c WHERE (SELECT B.A FROM BUG as b WHERE b.f = 3);"
 sqlUpdate = "UPDATE SCHEMA1.TABLE1 SET A=1, B=2, C=3 WHERE D=1;"
+sqlDelete = "DELETE FROM SCHEMA1.TABLE1 WHERE A=1 AND B=2"
 it = RecursiveTokenParser(sqlInsert)
 ut = RecursiveTokenParser(sqlUpdate)
 st = RecursiveTokenParser(sqlSelect)
+dt = RecursiveTokenParser(sqlDelete)
 print(it.extractColumn())
 print(ut.extractColumn())
 print(st.extractColumn())
+print(dt.extractColumn())
 print(it.parsedToken)
 print(ut.parsedToken)
 print(st.parsedToken)
+print(dt.parsedToken)
 # print(ut.extractColumn())
 # print(it.parsedToken)
 #print(st.extractColumn())
