@@ -1,3 +1,4 @@
+import os
 from lxml import etree
 from io import StringIO
 from pprint import pprint
@@ -46,6 +47,14 @@ def findWebController(node):
     while node is not None:
         if webController is None:
             webController = node.get('webController')
+        node = node.getparent();
+    return webController
+
+def findWebControllerJs(node):
+    webController = None
+    while node is not None:
+        if webController is None:
+            webController = node.get('webControllerJs')
         node = node.getparent();
     return webController
 
@@ -101,6 +110,8 @@ def findAllEvent(path):
         # Event의 Controller 파일 찾기
         controlName = findWebController(child)
         innerList['webController'] = controlName
+        controlNameJs = findWebControllerJs(child)
+        innerList['webControllerJs'] = controlName
         innerList['path'] = pathList
 
         # Event 정보를 담은 Dictionary를 List에 추가
@@ -122,6 +133,8 @@ def findAllLayout(path):
         innerList['allParentLayout'] = allParentLayout(child)
         controlName = findWebController(child)
         innerList['webController'] = controlName
+        controlNameJs = findWebControllerJs(child)
+        innerList['webControllerJs'] = controlName
         innerList['path'] = pathList
         # LinearLayout 정보를 담은 Dictionary를 List에 추가
         listLayout.append(innerList)
@@ -139,13 +152,47 @@ def findAllWidget(path):
             innerList['allParentObject'] = allParentObject(child)
             innerList['parentObject'] = parentObject(child)
             innerList['path'] = pathList
+            controlName = findWebController(child)
+            innerList['webController'] = controlName
+            controlNameJs = findWebControllerJs(child)
+            innerList['webControllerJs'] = controlName
             listWidget.append(innerList)
     return listWidget
 
+def search(dirname, fileList):
+    try:
+        filenames = os.listdir(dirname)
+        for filename in filenames:
+            full_filename = os.path.join(dirname, filename)
+            if os.path.isdir(full_filename):
+                search(full_filename, fileList)
+            else:
+                ext = os.path.splitext(full_filename)[-1]
+                if ext == '.js':
+                    fileList.append(full_filename)
+    except PermissionError:
+        pass
+    finally:
+        return fileList
 
+def findAll(path):
+    widgetList = findAllWidget(path)
+    eventList = findAllEvent(path)
+    allList = matciWidgetEvent(widgetList, eventList)
+    pprint(allList)
 
+def matciWidgetEvent(widgetList, eventList):
+    allList = []
+    for wid in widgetList:
+        widMatch = 0
+        for ev in eventList:
+            if wid['widgetID'] == ev['widgetId']:
+                widMatch = widMatch + 1
+                wid['eventId'] = ev['eventId']
+                allList.append(wid)
+        if widMatch == 0:
+            allList.append(wid)
+    return allList
 
 #Event 및 Layout List 출력
-pprint(findAllEvent("/Users/이재원/Documents/code/a.xml"))
-pprint(findAllLayout("/Users/이재원/Documents/code/a.xml"))
-pprint(findAllWidget("/Users/이재원/Documents/code/a.xml"))
+findAll("/Users/이재원/Documents/code/a.xml")
