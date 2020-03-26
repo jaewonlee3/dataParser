@@ -3,6 +3,7 @@ import re
 from pprint import pprint
 import copy
 import json
+import csv
 
 jsFile = open("/Users/이재원/Documents/code/company.js", 'r', encoding='UTF-8')
 allLine = jsFile.read()
@@ -20,12 +21,14 @@ ControllerList = ['Top.App.onWidgetAttach', 'Top.Controller.create', 'Top.contro
 FunctionList = ['function(event']
 
 #  전체 리스트를 만드는 function으로 이를 실행하면 원하고자하는 모든 리스트를 불러와야 한다.
-#  Input: js파일을 input함
+#  Input: js파일, application 변수 리스트를 input함
 #  Output: Controller, Event, Ajax, SO, Event 내부에서 Call하는 Event
 def findAll(path, appVarList):
+    # 읽어오는 작업
     pathList = findPath(path)
     jsFile = open(path,'r', encoding='UTF-8')
     allLine = jsFile.read()
+    # 주석을 모두 제거
     allLine = delAnnotation(allLine)
     # Controller를 모두 찾아서 리스트화할것
     controlLevel = findController(allLine)
@@ -62,18 +65,9 @@ def findAll(path, appVarList):
     eventAll = eventUrlMapper(eventList,urlList)
     for evAll in eventAll:
         eventAllList.append(evAll)
+    # Event의 App이름들을 실제 Value로 치환
     for totalNum, evAll in enumerate(eventAllList):
-        if str(type(evAll)) == "<class 'list'>":
-            if len(evAll) > 0:
-                for num, ev in enumerate(evAll):
-                    for var in appVarList:
-                        if 'app' in ev.keys():
-                            appVar = ev['app']
-                            appValue = appVar.replace(var['name'], var['value'])
-                            ev['app'] = appValue
-                    evAll[num] = ev
-                eventAllList[totalNum] = evAll
-        elif str(type(evAll)) == "<class 'dict'>":
+        if str(type(evAll)) == "<class 'dict'>":
             for var in appVarList:
                 if 'app' in evAll.keys():
                     appVar = evAll['app']
@@ -81,9 +75,33 @@ def findAll(path, appVarList):
                     evAll['app'] = appValue
             evAll['path'] = pathList
             eventAllList[totalNum] = evAll
+    # 일부 key 가 없는 리스트들 key 넣어주기
+    for number, jsDic in enumerate(eventAllList):
+        if 'sg' not in jsDic.keys():
+            jsDic['sg'] = ""
+        if 'so' not in jsDic.keys():
+            jsDic['so'] = ""
+        if 'app' not in jsDic.keys():
+            jsDic['app'] = ""
+        if 'url' not in jsDic.keys():
+            jsDic['url'] = ""
+        eventAllList[number] = jsDic
+    # Path 종합해서 wobControllerJS 형태로 만들어주고
+    for number, jsDic in enumerate(eventAllList):
+        path = jsDic['path']
+        pathNew = []
+        srcLoc = path.index('src')
+        nowPath = ""
+        pathNew = path[srcLoc:]
+        for j in pathNew:
+            if j == 'src':
+                nowPath = nowPath + j
+            else:
+                nowPath = nowPath + '/' + j
+        jsDic['webControllerJs'] = nowPath
+        eventAllList[number] =jsDic
+    # 리스트에 중복되어 있는 값들 제거
     eventAll_NoDump = remove_dupe_dicts(eventAllList)
-
-    pprint(eventAll_NoDump)
     return eventAll_NoDump
     jsFile.close()
 
@@ -546,9 +564,11 @@ def findAllEvent(path):
 # 주석 제거
 # input: 자바스크립트 텍스트
 # output: 자바스크립트 텍스트
+# 현재까지 진행한 주석 제거 작업: //로 시작하는 스크립트 라인들 모두 제거
+# /*과 */ 사이에 있는 스크립트 모두 제거
+# ""와 ''사이에 있을 경우 //나 /*이 있어도 주석으로 인식 안하게 함
 def delAnnotation(allLine):
     allLine = allLine.replace('\t', '')
-
     newData = ""
     theNum = 0
     annoNum = 0
@@ -591,12 +611,12 @@ def delAnnotation(allLine):
         elif annoNum == 5 and i == '*':
             annoNum = 6
         elif annoNum == 6 and i == '*':
-            annoNum = 5
+            annoNum = 6
         elif i == '/' and annoNum == 6:
             annoNum = 0
+        elif annoNum == 6 and i != '*':
+            annoNum = 5
         elif annoNum == 5:
-            newData = newData
-        elif annoNum == 6:
             newData = newData
         else:
             newData = newData + i
@@ -651,7 +671,6 @@ def inputVariable(path):
                 var['value'] = var['value'].replace(varName, varValue)
             var['value'] = var['value'].replace("+","")
             variables[number] = var
-    print(variables)
     return variables
 
 
@@ -692,15 +711,34 @@ def remove_dupe_dicts(l):
 #     allFunctionList.append(FunctionDic)
 
 
-fileList = []
-
-kssk = search("/Users/이재원/Documents/fs", fileList)
-
-readJsFile(kssk)
 
 
 
-jsFile.close();
+
+def printTotal(list):
+    listFile = open("C:/Users/이재원/Documents/code/jsList.csv", "w")
+    wr = csv.writer(listFile)
+    rowNum = 1
+    wr.writerow([1,'jsPath','controllerId','eventId','url','app','sg','so'])
+    for Dic in list:
+        rowNum = rowNum + 1
+        wr.writerow([rowNum,Dic['path'],Dic['controller'],Dic['event'],Dic['url'],Dic['app'],Dic['sg'],Dic['so']])
+
+# fileList = []
+#
+# jsFileList = search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
+#
+# jsList = readJsFile(jsFileList)
+#
+# printTotal(jsList)
+
+# appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
+#
+# sss = findAll("C:/Users/이재원/Documents/code/pbs.js",appVar)
+#
+# pprint(sss)
+#
+# jsFile.close();
 
 
 #findAll("/Users/이재원/Documents/code/pbs.js")

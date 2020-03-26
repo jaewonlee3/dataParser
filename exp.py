@@ -1,8 +1,9 @@
+import csv
 
-a = 'http://192.168.156.156:14000\FS/JJ\ReadDepartment?action=SO'
-c = a.split('/')
-for k in c:
-    b = k.split('\\')
-    for j in b:
-        print('--------------')
-        print(j)
+a = {'aa': [1,23,4,5,6], 'bb': 'dd', 'cc': 'll'}
+
+f = open("C:/Users/이재원/Documents/code/newFile.csv", "w", newline = "")
+wr = csv.writer(f)
+wr.writerow([1, a['aa'],a['bb']])
+
+f.close()

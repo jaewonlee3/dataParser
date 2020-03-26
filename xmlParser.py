@@ -7,16 +7,15 @@ from pprint import pprint
 ns = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
       'resource': 'http://www.tmaxsoft.com/top/SNAPSHOT/resource'}
 
-# xml 트리 형태로 만들기
 
-tree = etree.parse("/Users/이재원/Documents/code/contractListLayout.xml")
-root = tree.getroot()
 
 def findPath(path):
     path2 = path.split('/')
     pathList = []
-    for i in path2:
-        pathList.append(i)
+    for p in path2:
+        path3 = p.split('\\')
+        for i in path3:
+            pathList.append(i)
     return pathList
 
 # Node의 Depth 구하는 함수, getParent 활용
@@ -95,15 +94,87 @@ def findAllEvent(path):
     for child in root.findall(".//resource:Event", ns):
         # Event들 정보 담을 Dictionary 생성
         innerList = {}
-        # Event의 Depth와 Key 찾아 담기
-        value = child.get('onKeyReleased')
-        if value is None:
-            value = child.get('onClick')
-        innerList['eventId'] = value
         # Event의 상위 위젯 id 및 Tag, Depth 찾아 담기
         childParent = child.getparent();
         innerList['widgetTag'] = childParent.tag
         innerList['widgetId'] = childParent.get('id')
+
+        # Event의 Depth와 Key 찾아 담기
+        value = child.get('onKeyReleased')
+        if value is None:
+            value = child.get('onClick')
+        if value == "":
+            value = child.get('onClick')
+        if value is None:
+            value = child.get('onDoubleClick')
+        if value == "":
+            value = child.get('onDoubleClick')
+        if value is None:
+            value = child.get('onKeyPressed')
+        if value == "":
+            value = child.get('onKeyPressed')
+        if value is None:
+            value = child.get('onUpdate')
+        if value == "":
+            value = child.get('onUpdate')
+        if value is None:
+            value = child.get('onSelect')
+        if value == "":
+            value = child.get('onSelect')
+        if value is None:
+            value = child.get('onChange')
+        if value == "":
+            value = child.get('onChange')
+        if value is None:
+            value = child.get('onRowClick')
+        if value == "":
+            value = child.get('onRowClick')
+        if value is None:
+            value = child.get('onRowDoubleClick')
+        if value == "":
+            value = child.get('onRowDoubleClick')
+        if value is None:
+            value = child.get('onFocus')
+        if value == "":
+            value = child.get('onFocus')
+        if value is None:
+            value = child.get('onFocusLost')
+        if value == "":
+            value = child.get('onFocusLost')
+        if value is None:
+            value = child.get('onKeyTyped')
+        if value == "":
+            value = child.get('onKeyTyped')
+        if value is None:
+            value = child.get('onAttach')
+        if value == "":
+            value = child.get('onAttach')
+        if value is None:
+            value = child.get('onClose')
+        if value == "":
+            value = child.get('onClose')
+        if value is None:
+            value = child.get('onTabChange')
+        if value == "":
+            value = child.get('onTabChange')
+        if value is None:
+            value = child.get('onTabClick')
+        if value == "":
+            value = child.get('onTabClick')
+        if value is None:
+            value = child.get('onItemClick')
+        if value == "":
+            value = child.get('onItemClick')
+        if value is None:
+            value = child.get('onItemDoubleClick')
+        if value == "":
+            value = child.get('onItemDoubleClick')
+        innerList['eventId'] = value
+        if value is not None:
+            innerList['eventId'] = innerList['eventId'].replace("#","")
+        # if value is None:
+        #     print(innerList['widgetId'])
+        #     print(pathList)
         # Event의 상위 Layout id 및 Depth 찾아 담기
         nodeLayout, layoutDepth = parentLayout(child, depth(child))
         innerList['layoutId'] = nodeLayout.get("id")
@@ -111,7 +182,7 @@ def findAllEvent(path):
         controlName = findWebController(child)
         innerList['webController'] = controlName
         controlNameJs = findWebControllerJs(child)
-        innerList['webControllerJs'] = controlName
+        innerList['webControllerJs'] = controlNameJs
         innerList['path'] = pathList
 
         # Event 정보를 담은 Dictionary를 List에 추가
@@ -134,7 +205,7 @@ def findAllLayout(path):
         controlName = findWebController(child)
         innerList['webController'] = controlName
         controlNameJs = findWebControllerJs(child)
-        innerList['webControllerJs'] = controlName
+        innerList['webControllerJs'] = controlNameJs
         innerList['path'] = pathList
         # LinearLayout 정보를 담은 Dictionary를 List에 추가
         listLayout.append(innerList)
@@ -145,6 +216,14 @@ def findAllWidget(path):
     pathList = findPath(path)
     tree = etree.parse(path)
     root = tree.getroot()
+    rootList = {}
+    rootList['widgetID'] = root.get('id')
+    rootList['allParentObject'] = []
+    rootList['parentObject'] = "parentObject(child)"
+    rootList['path'] = pathList
+    rootList['webController'] = root.get('webController')
+    rootList['webControllerJs'] = root.get('webControllerJs')
+    listWidget.append(rootList)
     for child in root.iter():
         innerList = {}
         if (child.get('id') != None):
@@ -155,7 +234,7 @@ def findAllWidget(path):
             controlName = findWebController(child)
             innerList['webController'] = controlName
             controlNameJs = findWebControllerJs(child)
-            innerList['webControllerJs'] = controlName
+            innerList['webControllerJs'] = controlNameJs
             listWidget.append(innerList)
     return listWidget
 
@@ -168,7 +247,7 @@ def search(dirname, fileList):
                 search(full_filename, fileList)
             else:
                 ext = os.path.splitext(full_filename)[-1]
-                if ext == '.js':
+                if ext == '.tlf':
                     fileList.append(full_filename)
     except PermissionError:
         pass
@@ -179,7 +258,11 @@ def findAll(path):
     widgetList = findAllWidget(path)
     eventList = findAllEvent(path)
     allList = matciWidgetEvent(widgetList, eventList)
-    pprint(allList)
+    for number, tlfDic in enumerate(allList):
+        if 'eventId' not in  tlfDic.keys():
+            tlfDic['eventId'] = ""
+        allList[number] = tlfDic
+    return allList
 
 def matciWidgetEvent(widgetList, eventList):
     allList = []
@@ -194,5 +277,18 @@ def matciWidgetEvent(widgetList, eventList):
             allList.append(wid)
     return allList
 
+def readTlfFile(list):
+    allList = []
+    for file in list:
+        listInFile = findAll(file)
+        allList = allList + listInFile
+    return allList
+
+
 #Event 및 Layout List 출력
-findAll("/Users/이재원/Documents/code/a.xml")
+
+# fileList = []
+#
+# totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
+# allList = readTlfFile(totalList)
+
