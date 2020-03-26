@@ -83,7 +83,7 @@ def PoParser(SGpath) :
     # 위 2개를 이용하여 meta의 경로도 지정해 준다.
     AppName = SGroot.get("ApplicationName")
     SgName = SGroot.get("serviceGroupName")
-    Metapath = "/data/git/PO/" + AppName + "/" + SgName + "/meta/"
+    Metapath = SGpath.replace("META-INF/servicegroup.xml", "meta/")
 
     if (os.path.isdir(Metapath) != True) :
         MetapathError = "잘못된 meta 경로 입니다. PO 빌드가 제대로 되었는지 확인해 주세요"
@@ -96,7 +96,10 @@ def PoParser(SGpath) :
     classname = ns21.replace('service-group','class-name')
     name = ns21.replace('service-group','name')
 
+
     for SO in SGroot.iter(SOroot) :
+
+
         # QueryLists에 담기위한 하나의 QueryList 생성
         QueryList = []
         QueryList.append(AppName)
@@ -231,8 +234,7 @@ if __name__ == '__main__' :
     hello()
     PoParser(UserPath)
     print(len(QueryLists))
-    for i in range(len(QueryLists)) :
-        print(QueryLists[i])
+
 
 
 #for data in root.findall(x):
