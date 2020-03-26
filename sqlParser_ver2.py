@@ -1,7 +1,6 @@
 ## -*- coding: UTF-8 -*-
 
 import sqlparse
-from sqlparse.sql import Where, Comparison, Parenthesis, Identifier, IdentifierList
 from array import *
 
 class RecursiveTokenParser(object):
@@ -53,13 +52,14 @@ class RecursiveTokenParser(object):
         #                                                             ㄴ> 서브쿼리 정보
         elif query_type == "UPDATE":
             for index, token in enumerate(parsedToken):
-                #update 쿼리는 "." 들어가는 정보는 SCHEMA.TABLE이 유일하다
-                #"." token을 찾아서 앞뒤의 정보로 스키마,테이블 이름 추출
-                if token == ".":
-                    schemaName = parsedToken[index-1]
-                    tableName = parsedToken[index+1]
+                #update 쿼리는 UPDATE 다음 무조건 스키마 이름. 테이블 이름 형태
+                # 0,2 인덱스로 추출
+                schemaName = parsedToken[0]
+                tableName = parsedToken[2]
+                whereCount = 0
+                subqueryCount = 0
                 #컬럼 정보는 컬럼이름 = 값 형태임으로 "=" 앞의 정보로 컬럼이름 추출
-                elif token == "=":
+                if token == "=":
                     columnInfo = [schemaName,tableName,parsedToken[index-1]]
                     if columnInfo not in self.info:
                         self.info.append(columnInfo)
@@ -68,33 +68,29 @@ class RecursiveTokenParser(object):
                 #      "="를 찾아서 위랑 똑같이 처리한다
                 #   2. Subquery 정보: (SELECT QUERY)
                 #       괄호 사이의 정보를 추출해서 tokenReport로 SELECT 형태로 다시 돌린다
-                elif token == "WHERE":
-                    whereCount = 1
-                    if parsedToken[index+1] == "(":
-                        subqueryCount = 1
-                        tokenSubQuery = parsedToken[index+1:]
-                        self.tokenReport("SELECT", tokenSubQuery)
-                        break
-                    else:
-                        tokenWhereEnd = parsedToken[index:]
-                        for subindex, token in enumerate(tokenWhereEnd):
-                            if token == "=":
-                                columnInfo = [schemaName,tableName,tokenWhereEnd[subindex-1]]
-                                if columnInfo not in self.info:
-                                    self.info.append(columnInfo)
+                elif token == "WHERE" and whereCount == 0:
+                    whereCount += 1
+                    tokenWhereEnd = parsedToken[index:]
+                    # print(tokenWhereEnd)
+                    for subindex, token in enumerate(tokenWhereEnd):
+                        if token == "(":
+                            subqueryCount += 1
+                            if subqueryCount == 1:
+                                tokenSubQuery = tokenWhereEnd[subindex+1:]
+                                self.tokenReport("SELECT", tokenSubQuery)
+                            elif token == ")":
+                                subqueryCount -=1
+
             return self.info
 
         elif query_type == "DELETE":
             whereCount = 0
             subqueryCount = 0
+            schemaName = parsedToken[1]
+            tableName = parsedToken[3]
             for index, token in enumerate(parsedToken):
                 if token == "WHERE" and whereCount == 0:
                     whereCount += 1
-                    tokenWhereStart = parsedToken[:index]
-                    for subindex, token in enumerate(tokenWhereStart):
-                        if token == ".":
-                            schemaName = tokenWhereStart[subindex-1]
-                            tableName = tokenWhereStart[subindex+1]
                     tokenWhereEnd = parsedToken[index:]
                     for subindex, token in enumerate(tokenWhereEnd):
                         if token == "(":
@@ -132,9 +128,6 @@ class RecursiveTokenParser(object):
                     for subindex, token  in enumerate(tokenWhereEnd):
                         if token == ".":
                             columnName.append([tokenWhereEnd[subindex-1], tokenWhereEnd[subindex+1]])
-                        elif token == ";":
-                            whereCount =0
-                            break
                         elif token == "(":
                             tokenSubQuery = tokenWhereEnd[subindex+1:]
                             self.tokenReport("SELECT", tokenSubQuery)
@@ -175,7 +168,7 @@ class RecursiveTokenParser(object):
 sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7);"
 sqlSelect1 = "SELECT c.A FROM SCHEMA1.CITY as c WHERE c.ABC = 1 AND c.TEST2=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND c.TEST = 1;"
 sqlSelect2 = "SELECT t.A, t1.B, t2.C FROM schema.table as t, schema1.table1 as t1, schema2.table2 as t2 WHERE t.B = 1 AND t.C = 1;"
-sqlUpdate = "UPDATE SCHEMA1.TABLE1 SET A=1, B=2, C=3 WHERE D=1 AND E=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1));"
+sqlUpdate = "UPDATE SCHEMA1.TABLE1 SET A=1, B=2, C=3 WHERE D=1 AND E=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND F=1;"
 sqlDelete = "DELETE FROM SCHEMA1.TABLE1 WHERE TEST=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) and A=1 "
 # it = RecursiveTokenParser(sqlInsert)
 ut = RecursiveTokenParser(sqlUpdate)
