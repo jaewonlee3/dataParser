@@ -220,7 +220,7 @@ def PoParser(SGpath) :
 
                                 DOFtree = elemTree.parse(DOFpath)
                                 DOFroot = DOFtree.getroot()
-                                QueryExtractor(QueryList4, DOFtree, QUeryName, DofDynamicstatements)
+                                QueryExtractor(QueryList4, DOFtree, QueryName, DofDynamicstatements)
     return 0
 
 def hello() :
