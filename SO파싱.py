@@ -80,11 +80,15 @@ def SetQueryParser(SetQuery, QueryList3, Metapath, doCall) :
 
 def QueryExtractor(QueryList4, DOFtree, AliasName, StatementType) :
     for statements in DOFtree.iter(StatementType) :
-        if (statements.get('alias') == AliasName) :
+        if (statements.get('alias') == AliasName):
             Query = statements.find(DofStatement).text
-            QueryList4.append(Query)
-            # 쿼리문까지 도달했으므로 하나의 리스트 완성. 원래의 QueryLists에 append 해준다.
-            QueryLists.append(QueryList4)
+            processedQuery = Query.replace('\n', ' ')
+            columnList = RecursiveTokenParser(processedQuery).extractColumn()
+            print(columnList)
+            QueryList4.append(processedQuery)
+            for column in columnList:
+                # 쿼리문까지 도달했으므로 하나의 리스트 완성. 원래의 QueryLists에 append 해준다.
+                QueryLists, append(QueryList4 + column)
     return 0
 
 def PoParser(SGpath) :
