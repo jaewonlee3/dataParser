@@ -88,6 +88,9 @@ def QueryExtractor(QueryList4, DOFtree, AliasName, StatementType) :
 
 def PoParser(SGpath) :
     #SGpath = '/data/git/FS/CORE/META-INF/servicegroup.xml'
+    if (os.path.isfile(SGpath) != True) :
+        print("잘못된 service group 경로 입니다. OS 별 directory 양식을 지켜주세요.")
+        return 0
     SGtree = elemTree.parse(SGpath)
     SGroot = SGtree.getroot()
 
@@ -97,6 +100,9 @@ def PoParser(SGpath) :
     SgName = SGroot.get("serviceGroupName")
     MetaInfPath = os.path.dirname(SGpath)
     MetaPathList = MetaInfPath.split(os.path.sep)
+    if (len(MetaPathList) <= 1) :
+        print("잘못된 service group 경로입니다. OS 별 directory 양식을 지켜주세요.")
+        return 0
     if (MetaPathList[0] == "") :
         MetaPathList[0] = "/"
     MetaPathList.remove("META-INF")
@@ -104,8 +110,9 @@ def PoParser(SGpath) :
     Metapath = os.path.join(MetaPathList[lastNum],"meta")
     for i in range(lastNum) :
         Metapath = os.path.join(MetaPathList[lastNum-1-i],Metapath)
+    Metapath = Metapath.replace(":",":\\")
     if (os.path.isdir(Metapath) != True) :
-        MetapathError = "잘못된 meta 경로 입니다. PO 빌드가 제대로 되었는지 확인해 주세요"
+        MetapathError = "잘못된 meta 경로 입니다. \\대신 /를 사용해 주세요."
         print(MetapathError)
         return 0
 
@@ -145,8 +152,9 @@ def PoParser(SGpath) :
         #SOpath = Metapath +"/"+ SOclassname.text.replace('.', '/') + '.so'
 
         if (os.path.isfile(SOpath) == False) :
+            print(SOpath)
             QueryList.append("SO path error")
-            print("잘못된 SO 경로입니다. 빌드를 확인해 주세요.")
+            print("잘못된 SO 경로입니다. 쓰이지 않는 so 이거나, 빌드가 안된 것이므로 영향도 분석에서 제외하겠습니다.")
             continue
 
         tree = elemTree.parse(SOpath)
@@ -242,7 +250,7 @@ def PoParser(SGpath) :
                             if (os.path.isfile(DOFpath) == False) :
                                 print(QueryList3)
                                 print(DOFpath)
-                                print("잘못된 DOF 경로 입니다. 쓰이지 않는 DOF 이거나, 빌드를 확인해 주세요")
+                                print("잘못된 DOF 경로 입니다. 쓰이지 않는 DOF 이거나, 빌드가 안된 DOF 이므로 영향도 분석에서 제외하겠습니다.")
                             # DOF에서 쿼리문 alias 가져오기.
                             # fullstatement 가 있다면 BO에 DOF를 연결하여 만든 alias를 썼다는 뜻
                             if (doCall.find('{http://www.tmax.co.kr/proobject/flow}fullStatement') != None) :
@@ -276,7 +284,6 @@ def hello() :
 if __name__ == '__main__' :
 
     UserPath = input('servicegroup.xml 경로를 입력해 주세요 : ')
-    hello()
     PoParser(UserPath)
     print(len(QueryLists))
 
