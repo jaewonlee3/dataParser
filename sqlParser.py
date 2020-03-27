@@ -16,7 +16,7 @@ class RecursiveTokenParser(object):
     def extractColumn(self):
         #query type을 가져오는 함수 -> tokenReport에서 query type에 따라 처리방식 결정
         query_type = self.stmt.get_type()
-        print("This is a "+ query_type+" query")
+        #print("This is a "+ query_type+" query")
         #입력한 query를 token화 시켜주는 함수
         for token in self.stmt.tokens:
             self.parseToken(token)
@@ -82,7 +82,7 @@ class RecursiveTokenParser(object):
                 elif token == "WHERE" and whereCount == 0:
                     whereCount += 1
                     tokenWhereEnd = parsedToken[index:]
-                    # print(tokenWhereEnd)
+                    # #print(tokenWhereEnd)
                     for subindex, token in enumerate(tokenWhereEnd):
                         if token == "(":
                             subqueryCount += 1
@@ -224,18 +224,18 @@ class RecursiveTokenParser(object):
             self.parsedToken.append(str(token))
 
 
-sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7);"
-sqlSelect1 = "SELECT c.A FROM SCHEMA1.CITY as c WHERE c.ABC = 1 AND c.TEST2=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND c.TEST = 1;"
-sqlSelect2 = "SELECT t.A, t1.B, t2.C FROM schema.table as t, schema1.table1 as t1, schema2.table2 as t2 WHERE t.B = 1 AND t.C = 1;"
-sqlUpdate = "UPDATE SCHEMA1.TABLE1 SET A=1, B=2, C=3 WHERE D=1 AND E=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND F=1;"
-sqlDelete = "DELETE FROM SCHEMA1.TABLE1 WHERE TEST=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) and A=1 "
+# sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7);"
+# sqlSelect1 = "SELECT c.A FROM SCHEMA1.CITY as c WHERE c.ABC = 1 AND c.TEST2=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND c.TEST = 1;"
+# sqlSelect2 = "SELECT t.A, t1.B, t2.C FROM schema.table as t, schema1.table1 as t1, schema2.table2 as t2 WHERE t.B = 1 AND t.C = 1;"
+# sqlUpdate = "UPDATE SCHEMA1.TABLE1 SET A=1, B=2, C=3 WHERE D=1 AND E=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) AND F=1;"
+# sqlDelete = "DELETE FROM SCHEMA1.TABLE1 WHERE TEST=(SELECT b.A FROM SCHEMA2.BUG as b WHERE (SELECT D.A from schema4.table4 as D where D.C = 1)) and A=1 "
 # it = RecursiveTokenParser(sqlInsert)
-ut = RecursiveTokenParser(sqlUpdate)
-st = RecursiveTokenParser(sqlSelect1)
+#ut = RecursiveTokenParser(sqlUpdate)
+#st = RecursiveTokenParser(sqlSelect1)
 # st2 = RecursiveTokenParser(sqlSelect2)
 # dt = RecursiveTokenParser(sqlDelete)
-# print(it.extractColumn())
-print(ut.extractColumn())
-print(st.extractColumn())
-# print(dt.extractColumn())
-# print(st2.extractColumn())
+# #print(it.extractColumn())
+#print(ut.extractColumn())
+#print(st.extractColumn())
+# #print(dt.extractColumn())
+# #print(st2.extractColumn())
