@@ -2,6 +2,7 @@ import xml.etree.ElementTree as elemTree
 import re
 import copy
 import os
+import sys
 
 #Query를 저장하기 위한 list,
 # 각각의 원소는 [APP,SG, meta, com, tmax, ...depths, so, SoName, BoName, MethodName, DofName, QueryAliasName, Query] 로 구성된다.
@@ -285,7 +286,8 @@ if __name__ == '__main__' :
 
     UserPath = input('servicegroup.xml 경로를 입력해 주세요 : ')
     PoParser(UserPath)
-    print(len(QueryLists))
+    sys.stdout = open("PoParserOutput.txt", "w")
+    print(QueryLists)
 
 
 #for data in root.findall(x):
