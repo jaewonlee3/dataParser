@@ -52,7 +52,7 @@ def findAll(path, appVarList):
             urlList = urlList + urlInfo
             ev.pop('data')
             ev.pop('var')
-            ev = findEventFromFunc(ev, allEventList)
+            # ev = findEventFromFunc(ev, allEventList)
             ev.pop('func')
             eventLevel[number] = ev
         eventList = eventList + eventLevel
@@ -233,38 +233,6 @@ def findEvent(data):
         #Event List에 정보 담기
         eventList.append(eventDic)
     return eventList
-
-# 블록별로 찾기였으나, 자바스크립트는 지역변수가 블록별이 아니라 함수별로 지정되서 사용하지 않기로 됨
-def makeDepth(path):
-    jsFile = open(path, 'r', encoding='UTF-8')
-    allLine = jsFile.read()
-    dataListAll = []
-    dataList = []
-    nowdataList = []
-    nowdataList.append('')
-    depth = 0
-    ddss = "qqq{dfds{ffsss{aaass{qqweq}fff{were}ffs}dda}wwwww}sssaa{fdss}qqwww"
-    for stri in ddss:
-        number = 0
-        for j in nowdataList:
-            j = j + stri
-            nowdataList[number] = j
-            number = number + 1
-        if stri == '{':
-            depth = depth + 1
-            nowdataList.append('')
-            nowdataList[depth] = '{'
-        if stri == '}':
-            dataList.append(nowdataList[depth])
-            del nowdataList[depth]
-            depth = depth - 1
-            if depth == 0:
-                dataList.append(nowdataList[0])
-                del nowdataList[depth]
-                nowdataList.append('')
-                dataListAll.append(dataList)
-                del dataList
-                dataList = []
 
 # Iterator 개수 찾는건데 현재 안씀
 def getLenIter(iterator):
@@ -500,7 +468,7 @@ def eventUrlMapper(eventList, urlList):
         for url in urlList:
             if ev['event'] == url['event']:
                 evMatch = evMatch + 1
-                url['callEvent'] = ev['callEvent']
+                # url['callEvent'] = ev['callEvent']
                 eventAllList.append(url)
         if evMatch == 0:
             eventAllList.append(ev)

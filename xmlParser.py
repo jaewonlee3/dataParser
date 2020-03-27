@@ -36,7 +36,6 @@ def parentLayout(node, depth):
     while node.tag != "{http://www.tmaxsoft.com/top/SNAPSHOT/resource}LinearLayout":
         depth -= 1
         node = node.getparent();
-
     return node, depth
 
 # WebController 찾기
@@ -91,6 +90,7 @@ def findAllEvent(path):
     pathList = findPath(path)
     tree = etree.parse(path)
     root = tree.getroot()
+    keyList = ['onClick', 'onDoubleClick', 'onKeyPressed', 'onUpdate', 'onSelect', 'onChange', 'onRowClick', 'onRowDoubleClick', 'onFoucs', 'onFocusLost', 'onKeyTyped', 'onAttach', 'onClose','onTabChange','onTabClick','onItemClick','onItemDoubleClick']
     for child in root.findall(".//resource:Event", ns):
         # Event들 정보 담을 Dictionary 생성
         innerList = {}
@@ -98,77 +98,10 @@ def findAllEvent(path):
         childParent = child.getparent();
         innerList['widgetTag'] = childParent.tag
         innerList['widgetId'] = childParent.get('id')
-
         # Event의 Depth와 Key 찾아 담기
         value = child.get('onKeyReleased')
-        if value is None:
-            value = child.get('onClick')
-        if value == "":
-            value = child.get('onClick')
-        if value is None:
-            value = child.get('onDoubleClick')
-        if value == "":
-            value = child.get('onDoubleClick')
-        if value is None:
-            value = child.get('onKeyPressed')
-        if value == "":
-            value = child.get('onKeyPressed')
-        if value is None:
-            value = child.get('onUpdate')
-        if value == "":
-            value = child.get('onUpdate')
-        if value is None:
-            value = child.get('onSelect')
-        if value == "":
-            value = child.get('onSelect')
-        if value is None:
-            value = child.get('onChange')
-        if value == "":
-            value = child.get('onChange')
-        if value is None:
-            value = child.get('onRowClick')
-        if value == "":
-            value = child.get('onRowClick')
-        if value is None:
-            value = child.get('onRowDoubleClick')
-        if value == "":
-            value = child.get('onRowDoubleClick')
-        if value is None:
-            value = child.get('onFocus')
-        if value == "":
-            value = child.get('onFocus')
-        if value is None:
-            value = child.get('onFocusLost')
-        if value == "":
-            value = child.get('onFocusLost')
-        if value is None:
-            value = child.get('onKeyTyped')
-        if value == "":
-            value = child.get('onKeyTyped')
-        if value is None:
-            value = child.get('onAttach')
-        if value == "":
-            value = child.get('onAttach')
-        if value is None:
-            value = child.get('onClose')
-        if value == "":
-            value = child.get('onClose')
-        if value is None:
-            value = child.get('onTabChange')
-        if value == "":
-            value = child.get('onTabChange')
-        if value is None:
-            value = child.get('onTabClick')
-        if value == "":
-            value = child.get('onTabClick')
-        if value is None:
-            value = child.get('onItemClick')
-        if value == "":
-            value = child.get('onItemClick')
-        if value is None:
-            value = child.get('onItemDoubleClick')
-        if value == "":
-            value = child.get('onItemDoubleClick')
+        for key in keyList:
+            value = findEvent(value,key,child)
         innerList['eventId'] = value
         if value is not None:
             innerList['eventId'] = innerList['eventId'].replace("#","")
@@ -179,37 +112,35 @@ def findAllEvent(path):
         nodeLayout, layoutDepth = parentLayout(child, depth(child))
         innerList['layoutId'] = nodeLayout.get("id")
         # Event의 Controller 파일 찾기
-        controlName = findWebController(child)
-        innerList['webController'] = controlName
-        controlNameJs = findWebControllerJs(child)
-        innerList['webControllerJs'] = controlNameJs
+        innerList['webController'] = findWebController(child)
+        innerList['webControllerJs'] = findWebControllerJs(child)
         innerList['path'] = pathList
 
         # Event 정보를 담은 Dictionary를 List에 추가
         listEvent.append(innerList)
     return listEvent
 
-# LinearLayout들 다 찾기
-def findAllLayout(path):
-    listLayout = []
-    pathList = findPath(path)
-    tree = etree.parse(path)
-    root = tree.getroot()
-    for child in root.findall(".//resource:LinearLayout", ns):
-        # LinearLayout 정보 담을 Dictionary 생성
-        innerList = {}
-        # LinearLayout id 및 Depth 찾아 담기
-        innerList['layoutId'] = child.get('id')
-        innerList['parentLayout'] = child.getparent().get("id");
-        innerList['allParentLayout'] = allParentLayout(child)
-        controlName = findWebController(child)
-        innerList['webController'] = controlName
-        controlNameJs = findWebControllerJs(child)
-        innerList['webControllerJs'] = controlNameJs
-        innerList['path'] = pathList
-        # LinearLayout 정보를 담은 Dictionary를 List에 추가
-        listLayout.append(innerList)
-    return listLayout
+# # LinearLayout들 다 찾기
+# def findAllLayout(path):
+#     listLayout = []
+#     pathList = findPath(path)
+#     tree = etree.parse(path)
+#     root = tree.getroot()
+#     for child in root.findall(".//resource:LinearLayout", ns):
+#         # LinearLayout 정보 담을 Dictionary 생성
+#         innerList = {}
+#         # LinearLayout id 및 Depth 찾아 담기
+#         innerList['layoutId'] = child.get('id')
+#         innerList['parentLayout'] = child.getparent().get("id");
+#         innerList['allParentLayout'] = allParentLayout(child)
+#         controlName = findWebController(child)
+#         innerList['webController'] = controlName
+#         controlNameJs = findWebControllerJs(child)
+#         innerList['webControllerJs'] = controlNameJs
+#         innerList['path'] = pathList
+#         # LinearLayout 정보를 담은 Dictionary를 List에 추가
+#         listLayout.append(innerList)
+#     return listLayout
 
 # 모든 Widget들 찾기
 def findAllWidget(path):
@@ -290,10 +221,17 @@ def readTlfFile(list):
     return allList
 
 
+def findEvent(value, key, child):
+    if value is None:
+            value = child.get(key)
+    if value == "":
+            value = child.get(key)
+    return value
+
 #Event 및 Layout List 출력
 
-# fileList = []
-#
-# totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
-# allList = readTlfFile(totalList)
+fileList = []
 
+totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
+allList = readTlfFile(totalList)
+pprint(allList)

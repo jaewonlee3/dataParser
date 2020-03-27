@@ -30,47 +30,17 @@ def matchXmlAndJs(xmlList, jsList):
             if jsDic['event'] == 'onWidgetAttach' or jsDic['event'] == 'init':
                 if jsDic['controller'] == xmlDic['widgetID']:
                     xmlMatch = xmlMatch + 1
-                    totalDic['xmlPath'] = xmlDic['path']
-                    totalDic['parentObject'] = xmlDic['allParentObject']
-                    totalDic['widget'] = xmlDic['widgetID']
-                    totalDic['controller'] = jsDic['controller']
-                    totalDic['event'] = jsDic['event']
-                    totalDic['jsPath'] = jsDic['path']
-                    totalDic['url'] = jsDic['url']
-                    totalDic['app'] = jsDic['app']
-                    totalDic['sg'] = jsDic['sg']
-                    totalDic['so'] = jsDic['so']
-                    totalList.append(totalDic)
+                    inputValueFormal(totalDic, jsDic, xmlDic, totalList)
             # tlf의 webController와 js쪽의 controller가 같거나 tlf의 webControllerJs와 js의 path가 같고, tlf의 event와 js의 event가 같아야함
             elif xmlDic['webController'] == jsDic['controller'] or xmlDic['webControllerJs'] == jsDic['webControllerJs']:
                 if xmlDic['eventId'] == jsDic['event']:
                     xmlMatch = xmlMatch + 1
-                    totalDic['xmlPath'] = xmlDic['path']
-                    totalDic['parentObject'] = xmlDic['allParentObject']
-                    totalDic['widget'] = xmlDic['widgetID']
-                    totalDic['controller'] = jsDic['controller']
-                    totalDic['event'] = jsDic['event']
-                    totalDic['jsPath'] = jsDic['path']
-                    totalDic['url'] = jsDic['url']
-                    totalDic['app'] = jsDic['app']
-                    totalDic['sg'] = jsDic['sg']
-                    totalDic['so'] = jsDic['so']
-                    totalList.append(totalDic)
+                    inputValueFormal(totalDic, jsDic, xmlDic, totalList)
             # tlf쪽과 js쪽의 event 이름이 가트며, event가 global event
             elif xmlDic['eventId'] == jsDic['event']:
                 if jsDic['controller'] == 'FStop3062Logic' or jsDic['controller'] == 'FI_1Q_TOPLogic':
                     xmlMatch = xmlMatch + 1
-                    totalDic['xmlPath'] = xmlDic['path']
-                    totalDic['parentObject'] = xmlDic['allParentObject']
-                    totalDic['widget'] = xmlDic['widgetID']
-                    totalDic['controller'] = jsDic['controller']
-                    totalDic['event'] = jsDic['event']
-                    totalDic['jsPath'] = jsDic['path']
-                    totalDic['url'] = jsDic['url']
-                    totalDic['app'] = jsDic['app']
-                    totalDic['sg'] = jsDic['sg']
-                    totalDic['so'] = jsDic['so']
-                    totalList.append(totalDic)
+                    inputValueFormal(totalDic, jsDic, xmlDic, totalList)
         # js와 매칭되지 않은 tlf쪽의 리스트들을 넣어줌
         if xmlMatch == 0:
             totalDic['xmlPath'] = xmlDic['path']
@@ -126,6 +96,19 @@ def printTotal(list):
         rowNum = rowNum + 1
         wr.writerow([rowNum,Dic['xmlPath'],Dic['parentObject'],Dic['widget'],Dic['controller'],Dic['event'],Dic['jsPath'],Dic['url'],Dic['app'],Dic['sg'],Dic['so']])
     listFile.close()
+
+def inputValueFormal(totalDic, jsDic, xmlDic, totalList):
+    totalDic['xmlPath'] = xmlDic['path']
+    totalDic['parentObject'] = xmlDic['allParentObject']
+    totalDic['widget'] = xmlDic['widgetID']
+    totalDic['controller'] = jsDic['controller']
+    totalDic['event'] = jsDic['event']
+    totalDic['jsPath'] = jsDic['path']
+    totalDic['url'] = jsDic['url']
+    totalDic['app'] = jsDic['app']
+    totalDic['sg'] = jsDic['sg']
+    totalDic['so'] = jsDic['so']
+    totalList.append(totalDic)
 
 fileList = []
 jsFileList = jsParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
