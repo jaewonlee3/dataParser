@@ -16,10 +16,6 @@ allSpl = allLine.split("$.ajax")
 # ToDo: 아예 전체 Event를 찾아야 함 (Conroller롣 알아야 함)
 # ToDo: 전체 Event이름과 현재 Function의 이름을 비교해야 하고 거기서 Event이름 들 다 찾아야 함
 
-
-ControllerList = ['Top.App.onWidgetAttach', 'Top.Controller.create', 'Top.controller.get']
-FunctionList = ['function(event']
-
 #  전체 리스트를 만드는 function으로 이를 실행하면 원하고자하는 모든 리스트를 불러와야 한다.
 #  Input: js파일, application 변수 리스트를 input함
 #  Output: Controller, Event, Ajax, SO, Event 내부에서 Call하는 Event
@@ -281,7 +277,6 @@ def getLenIter(iterator):
 # Input: Event 정보
 # Output: Ajax의 URL, Event 이름, Controller 이름, app, sg, so
 def findUrl(data):
-
    # Event 정보에서 data, event 이름, controller 이름 가져오기
    sentence = data['data']
    eventName = data['event']
@@ -366,6 +361,8 @@ def findUrl2(data):
    return urlList
 
 # url을 받아와서 Application이 무엇인지 알기 위해 매칭할 수 있는 변수(appVar)와 SGSO찾는데 필요한 값 반환
+# Input: url값
+# Output: findSGSO에 넣어줄 값 + app 변수
 def findApp(url):
    appStart = url.find('${')
    appEnd = url.find('}')
@@ -379,6 +376,8 @@ def findApp(url):
    return appVarAll, appVar
 
 # findApp으로 찾은 appVarAll에서 SG와 SO 찾음
+# Input: url값
+# Output: SG, SO 값
 def findSGSO(url, appVar):
    appVarTrans = appVar.replace('$', '[$]')
    appCompileFirst = re.compile('')
@@ -492,6 +491,8 @@ def findAllEvent(data):
     return eventAll
 
 # Event List와 UrlList 매칭
+# Input: Event List, URL List
+# Output: js 전체 리스트
 def eventUrlMapper(eventList, urlList):
     eventAllList = []
     for ev in eventList:
@@ -623,6 +624,7 @@ def delAnnotation(allLine):
 
     return newData
 
+# 폴더에서 거기 하위폴더들에 있는 js파일을 다 찾아줌
 def search(dirname, fileList):
     try:
         filenames = os.listdir(dirname)
@@ -639,6 +641,7 @@ def search(dirname, fileList):
     finally:
         return fileList
 
+# app Value를 찾을 글로벌 변수들을 찾아줌
 def inputVariable(path):
     jsFile = open(path, 'r', encoding='UTF-8')
     allLine = jsFile.read()
@@ -684,6 +687,7 @@ def readJsFile(list):
         allList = allList + listInFile
     return allList
 
+# 파일 위치를 받아서 전체 Path들을 리스트화해줌
 def findPath(path):
     path2 = path.split('/')
     pathList = []
@@ -693,7 +697,7 @@ def findPath(path):
             pathList.append(i)
     return pathList
 
-
+# 겹치는 리스트들을 제거해줌
 def remove_dupe_dicts(l):
   list_of_strings = [json.dumps(d, sort_keys=True) for d in l ]
   list_of_strings = set(list_of_strings)

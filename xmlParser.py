@@ -8,7 +8,7 @@ ns = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
       'resource': 'http://www.tmaxsoft.com/top/SNAPSHOT/resource'}
 
 
-
+# Path 찾아서 리스트 형태로 
 def findPath(path):
     path2 = path.split('/')
     pathList = []
@@ -211,6 +211,7 @@ def findAllLayout(path):
         listLayout.append(innerList)
     return listLayout
 
+# 모든 Widget들 찾기
 def findAllWidget(path):
     listWidget = []
     pathList = findPath(path)
@@ -238,6 +239,7 @@ def findAllWidget(path):
             listWidget.append(innerList)
     return listWidget
 
+# 폴더에서 거기 하위폴더들에 있는 tlf파일을 다 찾아줌
 def search(dirname, fileList):
     try:
         filenames = os.listdir(dirname)
@@ -254,6 +256,7 @@ def search(dirname, fileList):
     finally:
         return fileList
 
+# 파일 위치를 찾아와서 전체 리스트를 읽어옴
 def findAll(path):
     widgetList = findAllWidget(path)
     eventList = findAllEvent(path)
@@ -264,6 +267,7 @@ def findAll(path):
         allList[number] = tlfDic
     return allList
 
+# EventList와 Widget List를 매칭해서 tlf 리스트 생성
 def matciWidgetEvent(widgetList, eventList):
     allList = []
     for wid in widgetList:
@@ -277,6 +281,7 @@ def matciWidgetEvent(widgetList, eventList):
             allList.append(wid)
     return allList
 
+# Tlf 파일리스트를 가져와서 거기에 있는 파일들 읽고 파서 결과물 출력
 def readTlfFile(list):
     allList = []
     for file in list:
