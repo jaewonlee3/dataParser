@@ -3,6 +3,7 @@ import re
 import copy
 import os
 import sys
+from sqlParser import RecursiveTokenParser
 
 #Query를 저장하기 위한 list,
 # 각각의 원소는 [APP,SG, meta, com, tmax, ...depths, so, SoName, BoName, MethodName, DofName, QueryAliasName, Query] 로 구성된다.
