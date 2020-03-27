@@ -39,19 +39,31 @@ def SetQueryParser(SetQuery, QueryList3, Metapath, doCall) :
     QueryInf[0] = QueryInf[0].replace(".USER","")
     DofPathInfs = QueryInf[0].split(".")
     if (len(DofPathInfs) >= 2) :
-        DofPath = Metapath + QueryInf[0].replace(".","/") + ".factory"
+        DofInfoList = QueryInf[0].split(".")
+        DofInfoList[len(DofInfoList)-1] = DofInfoList[len(DofInfoList)-1] + ".factory"
+        DofInfoPath = DofInfoList[0]
+        for i in range(len(DofInfoList)-1) :
+            DofInfoPath = os.path.join(DofInfoPath,DofInfoList[i+1])
+        DofPath = os.path.join(Metapath, DofInfoPath)
+        #DofPath = Metapath + "/" + QueryInf[0].replace(".","/") + ".factory"
     else :
         DofName = DofPathInfs[len(DofPathInfs)-1]
         for classinfo in doCall.iter('{http://www.tmax.co.kr/proobject/flow}classInfo') :
             if (classinfo.get("className") == DofName) :
                 DofPathInf = classinfo.get("classPackageName")
                 break
-        DofPath = Metapath + DofPathInf.replace(".","/") +"/" + DofName + ".factory"
+        DofPathInf = DofPathInf + "." + DofName
+        DofPathInfList = DofPathInf.split(".")
+        DofPathInfList[len(DofPathInfList)-1] = DofPathInfList[len(DofPathInfList)-1] + ".factory"
+        DofInfPath = DofPathInfList[0]
+        for i in range(len(DofPathInfList)-1) :
+            DofInfPath = os.path.join(DofInfPath, DofPathInfList[i+1])
+        DofPath = os.path.join(Metapath, DofInfPath)
+        #DofPath = Metapath + "/" + DofPathInf.replace(".","/") +"/" + DofName + ".factory"
     AliasName = QueryInf[1]
     # DOF 경로를 토대로 DOF 파일 파싱
     QueryList4 = copy.deepcopy(QueryList3)
     if (os.path.isfile(DofPath) != True) :
-        print("yes")
         QueryList4.append("DofPath Error")
         QueryLists.append(QueryList4)
         return 0
@@ -83,8 +95,15 @@ def PoParser(SGpath) :
     # 위 2개를 이용하여 meta의 경로도 지정해 준다.
     AppName = SGroot.get("ApplicationName")
     SgName = SGroot.get("serviceGroupName")
-    Metapath = SGpath.replace("META-INF/servicegroup.xml", "meta/")
-
+    MetaInfPath = os.path.dirname(SGpath)
+    MetaPathList = MetaInfPath.split(os.path.sep)
+    if (MetaPathList[0] == "") :
+        MetaPathList[0] = "/"
+    MetaPathList.remove("META-INF")
+    lastNum = len(MetaPathList)-1
+    Metapath = os.path.join(MetaPathList[lastNum],"meta")
+    for i in range(lastNum) :
+        Metapath = os.path.join(MetaPathList[lastNum-1-i],Metapath)
     if (os.path.isdir(Metapath) != True) :
         MetapathError = "잘못된 meta 경로 입니다. PO 빌드가 제대로 되었는지 확인해 주세요"
         print(MetapathError)
@@ -98,7 +117,6 @@ def PoParser(SGpath) :
 
 
     for SO in SGroot.iter(SOroot) :
-
 
         # QueryLists에 담기위한 하나의 QueryList 생성
         QueryList = []
@@ -114,14 +132,21 @@ def PoParser(SGpath) :
         for i in range(len(directory)-1) :
             #print(directory[i])
             QueryList.append(directory[i])
-        SOname = SO.find(name).text
+        SOname = "SO_NAME : " + SO.find(name).text
         QueryList.append(SOname)
         # SO파일 파싱
-        SOpath = Metapath + SOclassname.text.replace('.', '/') + '.so'
+        SoclassnameList = SOclassname.text.split('.')
+        SoclassnameList[len(SoclassnameList)-1] = SoclassnameList[len(SoclassnameList)-1] + ".so"
+        Soclasspath = SoclassnameList[0]
+        for i in range(len(SoclassnameList)-1) :
+            Soclasspath = os.path.join(Soclasspath,SoclassnameList[i+1])
+
+        SOpath = os.path.join(Metapath, Soclasspath)
+        #SOpath = Metapath +"/"+ SOclassname.text.replace('.', '/') + '.so'
 
         if (os.path.isfile(SOpath) == False) :
             QueryList.append("SO path error")
-            #print(QueryList)
+            print("잘못된 SO 경로입니다. 빌드를 확인해 주세요.")
             continue
 
         tree = elemTree.parse(SOpath)
@@ -144,7 +169,17 @@ def PoParser(SGpath) :
             BoInfs = BoInf.split(".")
             BoName = BoInfs[len(BoInfs)-1]
             QueryList2.append(BoName)
-            BOpath = Metapath + BoInf.replace('.', '/') + '.bo'
+            BoInfs[len(BoInfs)-1] = BoInfs[len(BoInfs)-1] + '.bo'
+            BoInfPath = BoInfs[0]
+            for i in range(len(BoInfs)-1) :
+                BoInfPath = os.path.join(BoInfPath, BoInfs[i+1])
+
+            BOpath = os.path.join(Metapath, BoInfPath)
+
+            if (os.path.isfile(BOpath) == False) :
+                print("잘못된 BO 경로입니다. 빌드를 확인해 주세요.")
+                QueryList2.append("BO path error")
+                continue
             #print(QueryList2)
        
             # bo 안의 메서드들 가져오기 (이 메서들마다 여러 쿼리가 존재할 수 있음, 쿼리는 dof로 부터 가져온다.).
@@ -196,8 +231,18 @@ def PoParser(SGpath) :
                                         SetQueryParser(SetQueryList[i], QueryList3, Metapath, doCall)
                             # method 가 접근하는 DOF 이름 얻어오기.
                             DOFname = doCall.find('{http://www.tmax.co.kr/proobject/flow}instanceInfo/{http://www.tmax.co.kr/proobject/flow}classInfo').get('className')
-                            DOFpath = Metapath + doCall.find('{http://www.tmax.co.kr/proobject/flow}instanceInfo/{http://www.tmax.co.kr/proobject/flow}classInfo').get('classPackageName').replace('.','/') + '/' + DOFname + '.factory'
-
+                            DofPathInfo = doCall.find('{http://www.tmax.co.kr/proobject/flow}instanceInfo/{http://www.tmax.co.kr/proobject/flow}classInfo').get('classPackageName') + "." + DOFname
+                            DofPathInfoList = DofPathInfo.split(".")
+                            DofPathInfoList[len(DofPathInfoList)-1] = DofPathInfoList[len(DofPathInfoList)-1] + ".factory"
+                            DofInfoPath = DofPathInfoList[0]
+                            for i in range(len(DofPathInfoList) -1) :
+                                DofInfoPath = os.path.join(DofInfoPath, DofPathInfoList[i+1])
+                            DOFpath = os.path.join(Metapath, DofInfoPath)
+                            #DOFpath = Metapath + "/" + doCall.find('{http://www.tmax.co.kr/proobject/flow}instanceInfo/{http://www.tmax.co.kr/proobject/flow}classInfo').get('classPackageName').replace('.','/') + '/' + DOFname + '.factory'
+                            if (os.path.isfile(DOFpath) == False) :
+                                print(QueryList3)
+                                print(DOFpath)
+                                print("잘못된 DOF 경로 입니다. 쓰이지 않는 DOF 이거나, 빌드를 확인해 주세요")
                             # DOF에서 쿼리문 alias 가져오기.
                             # fullstatement 가 있다면 BO에 DOF를 연결하여 만든 alias를 썼다는 뜻
                             if (doCall.find('{http://www.tmax.co.kr/proobject/flow}fullStatement') != None) :
@@ -234,7 +279,6 @@ if __name__ == '__main__' :
     hello()
     PoParser(UserPath)
     print(len(QueryLists))
-
 
 
 #for data in root.findall(x):
