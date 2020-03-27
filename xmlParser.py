@@ -96,7 +96,6 @@ def findAllEvent(path):
         innerList = {}
         # Event의 상위 위젯 id 및 Tag, Depth 찾아 담기
         childParent = child.getparent();
-        innerList['widgetTag'] = childParent.tag
         innerList['widgetId'] = childParent.get('id')
         # Event의 Depth와 Key 찾아 담기
         value = child.get('onKeyReleased')
@@ -105,9 +104,6 @@ def findAllEvent(path):
         innerList['eventId'] = value
         if value is not None:
             innerList['eventId'] = innerList['eventId'].replace("#","")
-        # if value is None:
-        #     print(innerList['widgetId'])
-        #     print(pathList)
         # Event의 상위 Layout id 및 Depth 찾아 담기
         nodeLayout, layoutDepth = parentLayout(child, depth(child))
         innerList['layoutId'] = nodeLayout.get("id")
@@ -163,10 +159,8 @@ def findAllWidget(path):
             innerList['allParentObject'] = allParentObject(child)
             innerList['parentObject'] = parentObject(child)
             innerList['path'] = pathList
-            controlName = findWebController(child)
-            innerList['webController'] = controlName
-            controlNameJs = findWebControllerJs(child)
-            innerList['webControllerJs'] = controlNameJs
+            innerList['webController'] = findWebController(child)
+            innerList['webControllerJs'] = findWebControllerJs(child)
             listWidget.append(innerList)
     return listWidget
 
