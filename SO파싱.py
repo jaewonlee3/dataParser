@@ -85,11 +85,10 @@ def QueryExtractor(QueryList4, DOFtree, AliasName, StatementType) :
             Query = statements.find(DofStatement).text
             processedQuery = Query.replace('\n', ' ')
             columnList = RecursiveTokenParser(processedQuery).extractColumn()
-            print(columnList)
             QueryList4.append(processedQuery)
             for column in columnList:
                 # 쿼리문까지 도달했으므로 하나의 리스트 완성. 원래의 QueryLists에 append 해준다.
-                QueryLists, append(QueryList4 + column)
+                QueryLists.append(QueryList4 + column)
     return 0
 
 def PoParser(SGpath) :
