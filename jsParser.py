@@ -593,8 +593,7 @@ def delAnnotation(allLine):
     return newData
 
 # 폴더에서 거기 하위폴더들에 있는 js파일을 다 찾아줌
-def search(dirname):
-    fileList = []
+def search(dirname,fileList):
     try:
         filenames = os.listdir(dirname)
         for filename in filenames:
@@ -645,28 +644,29 @@ def inputVariable(path):
             variables[number] = var
     return variables
 
-def findVariableFolder(path):
-    theName = ""
+def findVariableFolder(path, theList):
     try:
         filenames = os.listdir(path)
         for filename in filenames:
             full_filename = os.path.join(path, filename)
             if os.path.isdir(full_filename):
-                findVariableFolder(full_filename)
+                findVariableFolder(full_filename, theList)
             else:
                 file_name = os.path.split(full_filename)[-1]
                 if file_name == 'variables.js':
-                    theName = full_filename
+                    theList.append(full_filename)
     except PermissionError:
         pass
     finally:
-        return theName
+        return theList
+
 
 
 
 def readJsFile(list, path):
-    vairablePath = findVariableFolder(path)
-    appVarList = inputVariable(vairablePath)
+    theList = []
+    variablePath = findVariableFolder(path,theList)
+    appVarList = inputVariable(variablePath[0])
     allList = []
     for file in list:
         listInFile = findAll(file, appVarList)
@@ -714,13 +714,16 @@ def printTotal(list):
         rowNum = rowNum + 1
         wr.writerow([rowNum,Dic['path'],Dic['controller'],Dic['event'],Dic['url'],Dic['app'],Dic['sg'],Dic['so']])
 
-# findVariableFolder("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
-
-# fileList = []
-# # "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
-# jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", fileList)
+# theList = []
+# ss = findVariableFolder("C:/Users/이재원/Documents/FI_TOP_1Q-feature", theList)
 #
-# jsList = readJsFile(jsFileList, "C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+# # "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
+# fileList = []
+# jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature",fileList)
+#
+# jsList = readJsFile(jsFileList,"C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+#
+# print(jsList)
 #
 # printTotal(jsList)
 #
