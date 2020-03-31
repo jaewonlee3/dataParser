@@ -35,7 +35,7 @@ def poTopMatchingMain(poPath, topPath):
 
     tlfFileList = []
 
-    xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", tlfFileList)
+    xmlFileList = xmlParser.search(topPath, tlfFileList)
     xmlList = xmlParser.readTlfFile(xmlFileList)
 
     topList = matcher.matchXmlAndJs(xmlList, jsList)

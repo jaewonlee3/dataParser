@@ -5,9 +5,7 @@ import copy
 import json
 import csv
 
-jsFile = open("/Users/이재원/Documents/code/company.js", 'r', encoding='UTF-8')
-allLine = jsFile.read()
-allSpl = allLine.split("$.ajax")
+
 
 ## Token이 될 수 있는것들: {, (, ), }
 ## Controller 위해 찾아야하는 것들: onWidgetAttach / Top.Controller.create / Top.Controller.get

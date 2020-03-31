@@ -18,13 +18,13 @@ def findAll(path, appVarList):
     allLine = utilFunc.delAnnotation(allLine)
     # Controller를 모두 찾아서 리스트화할것
     controlLevel = findController(allLine)
-    dataExcludeCon = dataExclCon(allLine)
+    # dataExcludeCon = dataExclCon(allLine)
 
     urlList = []
     eventList = []
     eventAllList = []
 
-    eventOutConList = findEventNotInCon(dataExcludeCon)
+    # eventOutConList = findEventNotInCon(dataExcludeCon)
     for co in controlLevel:
         eventLevel = findEventInCon(co)
         urlInOnWidget = findUrlInAttach(co)
@@ -39,16 +39,18 @@ def findAll(path, appVarList):
             ev.pop('data')
             eventLevel[number] = ev
         eventList = eventList + eventLevel
-    print(eventAllList)
     eventAll = eventUrlMapper(eventList, urlList)
+    print(eventAllList)
     for evAll in eventAll:
         eventAllList.append(evAll)
+    inputPathAndWebControllerJS(eventAllList, pathList)
+    eventAll_NoDump = utilFunc.remove_dupe_dicts(eventAllList)
+    return eventAll_NoDump
+    jsFile.close()
 
 
 
-
-
-def search(dirname, fileList):
+def search(dirname,fileList):
     try:
         filenames = os.listdir(dirname)
         for filename in filenames:
@@ -65,9 +67,26 @@ def search(dirname, fileList):
         return fileList
 
 
+def inputPathAndWebControllerJS(jsList, pathList):
+    for number, jsDic in enumerate(jsList):
+        jsDic['path'] = pathList
+        srcLoc = pathList.index('src')
+        nowPath = ""
+        pathNew = pathList[srcLoc:]
+        for j in pathNew:
+            if j == 'src':
+                nowPath = nowPath + j
+            else:
+                nowPath = nowPath + '/' + j
+        jsDic['webControllerJs'] = nowPath
+        jsList[number] =jsDic
 
-def readJsFile(list):
-    appVarList = inputVariable("/Users/이재원/Documents/code/variables.js")
+
+
+def readJsFile(list, path):
+    theList = []
+    variablePath = findVariableFolder(path,theList)
+    appVarList = inputVariable(variablePath[0])
     allList = []
     for file in list:
         listInFile = findAll(file, appVarList)
@@ -80,7 +99,7 @@ def dataExclCon(sentence):
     controllerRangeList = []
     for co in controllerObj:
         coStart = co.start()
-        coEnd = coEnd()
+        coEnd = co.end()
         controlData = sentence[coStart:]
         tokenNum = 0
         wordCount = 0
@@ -97,21 +116,21 @@ def dataExclCon(sentence):
             if tokenNum == 0:
                 break
         controllerRange = []
-        controllerRange.append(coStart, coStart + startPoint + wordCount)
+        controllerRange.append(sentence[coStart: coStart + startPoint + wordCount])
         controllerRangeList.append(controllerRange)
     lenRangeList = len(controllerRangeList)
     newData = ""
     if lenRangeList == 0:
         newData = sentence
     elif lenRangeList == 1:
-        newData = sentence[:lenRangeList[0][0]]
-        newData = newData + sentence[lenRangeList[0][1]:]
+        newData = sentence[:controllerRangeList[0][0]]
+        newData = newData + sentence[controllerRangeList[0][1]:]
     else:
-        newData = sentence[:lenRangeList[0][0]]
+        newData = sentence[:controllerRangeList[0][0]]
         for i in range(1,lenRangeList-1):
-            newData = newData + sentence[lenRangeList[i-1][1]:lenRangeList[i][0]]
+            newData = newData + sentence[controllerRangeList[i-1][1]:controllerRangeList[i][0]]
             if i == (lenRangeList -1):
-                newData = newData + sentence[lenRangeList[i][1]:]
+                newData = newData + sentence[controllerRangeList[i][1]:]
     return newData
 
 # Event List와 UrlList 매칭
@@ -382,19 +401,35 @@ def inputVariable(path):
             variables[number] = var
     return variables
 
-def findVariableFolder(path):
-    theName = ""
+def findVariableFolder(path, theList):
     try:
         filenames = os.listdir(path)
         for filename in filenames:
             full_filename = os.path.join(path, filename)
             if os.path.isdir(full_filename):
-                findVariableFolder(full_filename)
+                findVariableFolder(full_filename, theList)
             else:
                 file_name = os.path.split(full_filename)[-1]
                 if file_name == 'variables.js':
-                    theName = full_filename
+                    theList.append(full_filename)
     except PermissionError:
         pass
     finally:
-        return theName
+        return theList
+
+
+
+theList = []
+ss = findVariableFolder("C:/Users/이재원/Documents/FI_TOP_1Q-feature", theList)
+
+# "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
+fileList = []
+jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature",fileList)
+
+jsList = readJsFile(jsFileList,"C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+
+pprint(jsList)
+
+# appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
+#
+# jsFile.close();
