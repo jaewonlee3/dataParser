@@ -666,7 +666,7 @@ def findVariableFolder(path):
 
 def readJsFile(list, path):
     vairablePath = findVariableFolder(path)
-    appVarList = inputVariable("/Users/이재원/Documents/code/variables.js")
+    appVarList = inputVariable(vairablePath)
     allList = []
     for file in list:
         listInFile = findAll(file, appVarList)
