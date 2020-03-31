@@ -110,15 +110,15 @@ def inputValueFormal(totalDic, jsDic, xmlDic, totalList):
     totalDic['so'] = jsDic['so']
     totalList.append(totalDic)
 
-fileList = []
-jsFileList = jsParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
-
-jsList = jsParser.readJsFile(jsFileList)
-
-tlfFileList = []
-
-xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", tlfFileList)
-xmlList = xmlParser.readTlfFile(xmlFileList)
-
-kk = matchXmlAndJs(xmlList, jsList)
-printTotal(kk)
+# fileList = []
+# jsFileList = jsParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
+#
+# jsList = jsParser.readJsFile(jsFileList)
+#
+# tlfFileList = []
+#
+# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", tlfFileList)
+# xmlList = xmlParser.readTlfFile(xmlFileList)
+#
+# kk = matchXmlAndJs(xmlList, jsList)
+# printTotal(kk)

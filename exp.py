@@ -1,9 +1,12 @@
 import csv
+import ast
 
-a = {'aa': [1,23,4,5,6], 'bb': 'dd', 'cc': 'll'}
 
-f = open("C:/Users/이재원/Documents/code/newFile.csv", "w", newline = "")
-wr = csv.writer(f)
-wr.writerow([1, a['aa'],a['bb']])
+with open('C:/Users/이재원/Documents/code/PoParserOutput.txt', 'r', encoding='UTF-8') as f:
+    mylist = ast.literal_eval(f.read())
 
-f.close()
+for k in mylist:
+    print(k)
+    print('-----------------')
+
+

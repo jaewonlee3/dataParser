@@ -224,8 +224,8 @@ def findEvent(value, key, child):
 
 #Event 및 Layout List 출력
 
-fileList = []
-
-totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
-allList = readTlfFile(totalList)
-pprint(allList)
+# fileList = []
+#
+# totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
+# allList = readTlfFile(totalList)
+# pprint(allList)

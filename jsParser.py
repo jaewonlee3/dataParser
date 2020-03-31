@@ -67,7 +67,8 @@ def findAll(path, appVarList):
             for var in appVarList:
                 if 'app' in evAll.keys():
                     appVar = evAll['app']
-                    appValue = appVar.replace(var['name'], var['value'])
+                    #appValue = appVar.replace(var['name'], var['value'])
+                    appValue = "FS"
                     evAll['app'] = appValue
             evAll['path'] = pathList
             eventAllList[totalNum] = evAll
@@ -189,7 +190,7 @@ def findController(sentence):
 # Output: Event 이름 및 이에 해당하는 자바 스크립트가 포함된 리스트
 def findEvent(data):
     # Event의 위치를 모두 찾을 것
-    eventObj = re.finditer('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]', data['data'])
+    eventObj = re.finditer('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]|function\s?[A-Za-z]\S+\s?[(]\s?\S+\s?,\s?\S+\s?[)]', data['data'])
     # Event를 담을 리스트 및 이 Event 하의 자바스크립트 텍스트를 담을 임시로 담을 곳
     eventList = []
     eventData = ""
@@ -290,7 +291,7 @@ def findUrl(data):
 # Input: Controller 정보
 # Output: Ajax의 URL, Event 이름, Controller 이름, app, sg, so
 def findUrl2(data):
-   eventMatch = re.search('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]', data['data'])
+   eventMatch = re.search('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]|function\s?[A-Za-z]\S+\s?[(]\s?\S+\s?,\s?\S+\s?[)]', data['data'])
    ajaxCompile = re.compile('[$][.]ajax|Top[.]Ajax[.]execute')
    if eventMatch is None:
        sentence = data['data']
@@ -430,7 +431,7 @@ def matchVarFunc(varList, funcList):
 # data 내에 있는 모든 event 이름 찾기
 # 추후 변경이 필요함
 def findAllEvent(data):
-    events = re.finditer('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]', data)
+    events = re.finditer('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]|function\s?\S\s?[(]\s?\S+\s?,\s?\S+\s?[)]', data)
     eventAll = []
     for ev in events:
         eventDic = {}
@@ -688,7 +689,7 @@ def remove_dupe_dicts(l):
 
 
 def printTotal(list):
-    listFile = open("C:/Users/이재원/Documents/code/jsList.csv", "w")
+    listFile = open("C:/Users/이재원/Documents/code/jsList3.csv", "w")
     wr = csv.writer(listFile)
     rowNum = 1
     wr.writerow([1,'jsPath','controllerId','eventId','url','app','sg','so'])
@@ -698,19 +699,16 @@ def printTotal(list):
 
 # fileList = []
 #
-# jsFileList = search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
+# jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", fileList)
 #
 # jsList = readJsFile(jsFileList)
 #
 # printTotal(jsList)
-
+#
 # appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
-#
-# sss = findAll("C:/Users/이재원/Documents/code/pbs.js",appVar)
-#
-# pprint(sss)
 #
 # jsFile.close();
 
 
-#findAll("/Users/이재원/Documents/code/pbs.js")
+# jj = findAll("/Users/이재원/Documents/code/DocumentInit.js", appVar)
+# print(jj)
