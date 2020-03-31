@@ -593,7 +593,8 @@ def delAnnotation(allLine):
     return newData
 
 # 폴더에서 거기 하위폴더들에 있는 js파일을 다 찾아줌
-def search(dirname, fileList):
+def search(dirname):
+    fileList = []
     try:
         filenames = os.listdir(dirname)
         for filename in filenames:

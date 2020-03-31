@@ -180,14 +180,11 @@ def printTotal(list):
         wr.writerow(inputList)
     listFile.close()
 
-fileList = []
-jsFileList = jsParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", fileList)
 
+jsFileList = jsParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 jsList = jsParser.readJsFile(jsFileList, "C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 
-tlfFileList = []
-
-xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", tlfFileList)
+xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 xmlList = xmlParser.readTlfFile(xmlFileList)
 
 topList = matcher.matchXmlAndJs(xmlList, jsList)

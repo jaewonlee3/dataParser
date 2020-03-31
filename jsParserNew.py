@@ -7,7 +7,8 @@ import csv
 import utilFunc
 
 eventCompile = re.compile('[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?,\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?,\s?\S+\s?[)]|init\s?[:]\s?function[(]\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?\S+\s?[)]|[A-Za-z]\S+\s?[:]\s?function\s?[(]\s?[)]|function\s?[A-Za-z]\S+\s?[(]\s?\S+\s?,\s?\S+\s?[)]|function\s?[A-Za-z]\S+\s?[(]\s?\S+\s?[)]|function\s?[A-Za-z]\S+\s?[(][)]')
-
+ajaxCompile = re.compile('[$][.]ajax|Top[.]Ajax[.]execute')
+urlCompile = re.compile("url\s?[:]\s?[`][$]|url\s?[:]\s?'h")
 
 def findAll(path, appVarList):
     pathList = utilFunc.findPath(path)
@@ -19,9 +20,33 @@ def findAll(path, appVarList):
     controlLevel = findController(allLine)
     dataExcludeCon = dataExclCon(allLine)
 
+    urlList = []
+    eventList = []
+    eventAllList = []
+
     eventOutConList = findEventNotInCon(dataExcludeCon)
     for co in controlLevel:
         eventLevel = findEventInCon(co)
+        urlInOnWidget = findUrlInAttach(co)
+        urlList = urlList + urlInOnWidget
+        if len(urlInOnWidget) > 0:
+            for i in urlInOnWidget:
+                eventAllList.append(i)
+        #Event에 있는 URL, Appvar, SG, SO 추가
+        for number, ev in enumerate(eventLevel):
+            urlInfo = findUrl(ev)
+            urlList = urlList + urlInfo
+            ev.pop('data')
+            eventLevel[number] = ev
+        eventList = eventList + eventLevel
+    print(eventAllList)
+    eventAll = eventUrlMapper(eventList, urlList)
+    for evAll in eventAll:
+        eventAllList.append(evAll)
+
+
+
+
 
 def search(dirname, fileList):
     try:
@@ -89,10 +114,24 @@ def dataExclCon(sentence):
                 newData = newData + sentence[lenRangeList[i][1]:]
     return newData
 
-
-
-
-
+# Event List와 UrlList 매칭
+# Input: Event List, URL List
+# Output: js 전체 리스트
+def eventUrlMapper(eventList, urlList):
+    eventAllList = []
+    for ev in eventList:
+        evMatch = 0
+        for url in urlList:
+            if ev['event'] == url['event']:
+                evMatch = evMatch + 1
+                eventAllList.append(url)
+        if evMatch == 0:
+            ev['sg'] = ""
+            ev['so'] = ""
+            ev['app'] = ""
+            ev['url'] = ""
+            eventAllList.append(ev)
+    return eventAllList
 
 
 def putInfoToCon(sentence, co, controllerDic, controlData):
@@ -201,16 +240,15 @@ def findUrl(data):
    eventName = data['event']
    controlName = data['controller']
    # ajax를 모두 찾을 것
-   ajaxCompile = re.compile('[$][.]ajax|Top[.]Ajax[.]execute')
-   abc = ajaxCompile.finditer(sentence)
+   ajaxIter = ajaxCompile.finditer(sentence)
    # url 담을 그릇
    urlList = []
    # ajax의 url 찾기
-   for ajaxMatch in abc:
+   for ajaxMatch in ajaxIter:
        urlDic = {}
        #ajax에서 url 찾기
        ajaxMatchEnd = ajaxMatch.end()
-       urlMatch = re.search("url\s?[:]\s?[`][$]|url\s?[:]\s?'h", sentence[ajaxMatchEnd:])
+       urlMatch = urlCompile.search(sentence[ajaxMatchEnd:])
        if urlMatch is not None:
            # urlMatch에서 순수 url 찾아내기
            urlMatchEnd = urlMatch.end()
@@ -234,6 +272,48 @@ def findUrl(data):
            urlDic['so'] = soValue
            urlList.append(urlDic)
 
+   return urlList
+
+
+# findURL과 비슷하나 Event 하가 아니라 Controller 하에서 바로 시작함 (OnWidgetAttach일 때 사용)
+# Input: Controller 정보
+# Output: Ajax의 URL, Event 이름, Controller 이름, app, sg, so
+def findUrlInAttach(data):
+   eventMatch = eventCompile.search(data['data'])
+   if eventMatch is None:
+       sentence = data['data']
+   else:
+       eventStart = eventMatch.start()
+       sentence = data['data'][:eventStart]
+   controlName = data['name']
+   ajaxIter = ajaxCompile.finditer(sentence)
+   urlList = []
+   for ajaxMatch in ajaxIter:
+       urlDic = {}
+       # ajax에서 url 찾기
+       ajaxMatchStart = ajaxMatch.start()
+       ajaxMatchEnd = ajaxMatch.end()
+       urlMatch = urlCompile.search(sentence[ajaxMatchEnd:])
+       if urlMatch is not None:
+           # urlMatch에서 순수 url 찾아내기
+           urlMatchEnd = urlMatch.end()
+           kk = sentence[urlMatchEnd - 2 + ajaxMatchEnd:]
+           a = re.compile("`|'")
+           urlFirst = a.search(kk)
+           urlFirstLoc = urlFirst.end()
+           kk1 = kk[urlFirstLoc:]
+           urlEnd = a.search(kk1)
+           urlSecondLoc = urlFirstLoc + urlEnd.start()
+           urlSentence = kk[urlFirstLoc:urlSecondLoc]
+           appVarAll, appVar = findApp(urlSentence)
+           sgValue, soValue = findSGSO(urlSentence, appVarAll)
+           urlDic['url'] = urlSentence
+           urlDic['controller'] = controlName
+           urlDic['event'] = data['Event']
+           urlDic['app'] = appVar
+           urlDic['sg'] = sgValue
+           urlDic['so'] = soValue
+           urlList.append(urlDic)
    return urlList
 
 # url을 받아와서 Application이 무엇인지 알기 위해 매칭할 수 있는 변수(appVar)와 SGSO찾는데 필요한 값 반환
