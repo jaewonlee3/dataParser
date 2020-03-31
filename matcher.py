@@ -53,6 +53,7 @@ def matchXmlAndJs(xmlList, jsList):
             totalDic['app'] =""
             totalDic['sg'] = ""
             totalDic['so'] = ""
+            totalDic['matching'] = "N"
             totalList.append(totalDic)
     # xmlList와 jsList의 결과물들을 하나씩 뽑아와서 비교
     for jsDic in jsList:
@@ -80,6 +81,7 @@ def matchXmlAndJs(xmlList, jsList):
             totalDic['app'] = jsDic['app']
             totalDic['sg'] = jsDic['sg']
             totalDic['so'] = jsDic['so']
+            totalDic['matching'] = "N"
             totalList.append(totalDic)
     pprint(totalList)
     return totalList
@@ -108,6 +110,7 @@ def inputValueFormal(totalDic, jsDic, xmlDic, totalList):
     totalDic['app'] = jsDic['app']
     totalDic['sg'] = jsDic['sg']
     totalDic['so'] = jsDic['so']
+    totalDic['matching'] = "Y"
     totalList.append(totalDic)
 
 # fileList = []

@@ -288,10 +288,7 @@ def inputVariable(path):
         consSplit = consValue.split('=')
         consLeft = consSplit[0].replace(" ","")
         consDic['name'] = consLeft[5:]
-        consRight = consSplit[1].replace(" ","")
-        consRight = consRight.replace(';','')
-        consRight = consRight.replace('\n', '')
-        consRight = consRight.replace("'","")
+        consRight = consSplit[1].replace(" ","").replace(';','').replace('\n', '').replace("'","")
         consDic['value'] = consRight
         variables.append(consDic)
     for number, var in enumerate(variables):
@@ -304,3 +301,20 @@ def inputVariable(path):
             var['value'] = var['value'].replace("+","")
             variables[number] = var
     return variables
+
+def findVariableFolder(path):
+    theName = ""
+    try:
+        filenames = os.listdir(path)
+        for filename in filenames:
+            full_filename = os.path.join(path, filename)
+            if os.path.isdir(full_filename):
+                findVariableFolder(full_filename)
+            else:
+                file_name = os.path.split(full_filename)[-1]
+                if file_name == 'variables.js':
+                    theName = full_filename
+    except PermissionError:
+        pass
+    finally:
+        return theName

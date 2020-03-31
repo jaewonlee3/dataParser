@@ -98,7 +98,10 @@ def poTopMatching(poList, topList):
                 nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 7] = poL[soIndex + 3]
                 if lenPoL > soIndex + 5:
                     nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 8] = poL[soIndex + 5]
-                nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 9] = "Y"
+                if topL['matching'] == "Y":
+                    nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 9] = "Y"
+                else:
+                    nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 9] = "N"
                 totalList.append(nowList)
         if poMatch == 0:
             nowList = ["" for i in range(0,xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 10)]
