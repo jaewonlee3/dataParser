@@ -180,7 +180,7 @@ def printTotal(list):
 fileList = []
 jsFileList = jsParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", fileList)
 
-jsList = jsParser.readJsFile(jsFileList)
+jsList = jsParser.readJsFile(jsFileList, "C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 
 tlfFileList = []
 

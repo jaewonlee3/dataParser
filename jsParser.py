@@ -67,8 +67,7 @@ def findAll(path, appVarList):
             for var in appVarList:
                 if 'app' in evAll.keys():
                     appVar = evAll['app']
-                    #appValue = appVar.replace(var['name'], var['value'])
-                    appValue = "FS"
+                    appValue = appVar.replace(var['name'], var['value']).rstrip('/').split('/')[-1]
                     evAll['app'] = appValue
             evAll['path'] = pathList
             eventAllList[totalNum] = evAll
@@ -645,10 +644,27 @@ def inputVariable(path):
             variables[number] = var
     return variables
 
+def findVariableFolder(path):
+    theName = ""
+    try:
+        filenames = os.listdir(path)
+        for filename in filenames:
+            full_filename = os.path.join(path, filename)
+            if os.path.isdir(full_filename):
+                findVariableFolder(full_filename)
+            else:
+                file_name = os.path.split(full_filename)[-1]
+                if file_name == 'variables.js':
+                    theName = full_filename
+    except PermissionError:
+        pass
+    finally:
+        return theName
 
 
 
-def readJsFile(list):
+def readJsFile(list, path):
+    vairablePath = findVariableFolder(path)
     appVarList = inputVariable("/Users/이재원/Documents/code/variables.js")
     allList = []
     for file in list:
@@ -697,15 +713,17 @@ def printTotal(list):
         rowNum = rowNum + 1
         wr.writerow([rowNum,Dic['path'],Dic['controller'],Dic['event'],Dic['url'],Dic['app'],Dic['sg'],Dic['so']])
 
+# findVariableFolder("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+
 # fileList = []
-#
+# # "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
 # jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature", fileList)
 #
-# jsList = readJsFile(jsFileList)
+# jsList = readJsFile(jsFileList, "C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 #
 # printTotal(jsList)
 #
-# appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
+# # appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
 #
 # jsFile.close();
 
