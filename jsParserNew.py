@@ -23,7 +23,6 @@ def findAll(path, appVarList):
     urlList = []
     eventList = []
     eventAllList = []
-
     eventOutConList = findEventNotInCon(dataExcludeCon)
     for number, ev in enumerate(eventOutConList):
         urlInfo = findUrl(ev)
@@ -32,19 +31,20 @@ def findAll(path, appVarList):
         eventOutConList[number] = ev
     eventList = eventList + eventOutConList
     for co in controlLevel:
-        eventLevel = findEventInCon(co)
-        urlInOnWidget = findUrlInAttach(co)
-        urlList = urlList + urlInOnWidget
-        if len(urlInOnWidget) > 0:
+        if 'Event' in co.keys():
+            urlInOnWidget = findUrlInAttach(co)
+            urlList = urlList + urlInOnWidget
             for i in urlInOnWidget:
                 eventAllList.append(i)
         #Event에 있는 URL, Appvar, SG, SO 추가
-        for number, ev in enumerate(eventLevel):
-            urlInfo = findUrl(ev)
-            urlList = urlList + urlInfo
-            ev.pop('data')
-            eventLevel[number] = ev
-        eventList = eventList + eventLevel
+        else:
+            eventLevel = findEventInCon(co)
+            for number, ev in enumerate(eventLevel):
+                urlInfo = findUrl(ev)
+                urlList = urlList + urlInfo
+                ev.pop('data')
+                eventLevel[number] = ev
+            eventList = eventList + eventLevel
     eventAll = eventUrlMapper(eventList, urlList)
     for evAll in eventAll:
         eventAllList.append(evAll)
@@ -130,9 +130,9 @@ def dataExclCon(sentence):
         newData = newData + sentence[controllerRangeList[0][1]:]
     else:
         newData = sentence[:controllerRangeList[0][0]]
-        for i in range(1,lenRangeList-1):
+        for i in range(1,lenRangeList):
             newData = newData + sentence[controllerRangeList[i-1][1]:controllerRangeList[i][0]]
-            if i == (lenRangeList -1):
+            if i == (lenRangeList-1):
                 newData = newData + sentence[controllerRangeList[i][1]:]
     return newData
 
@@ -303,13 +303,8 @@ def findUrl(data):
 # Input: Controller 정보
 # Output: Ajax의 URL, Event 이름, Controller 이름, app, sg, so
 def findUrlInAttach(data):
-   eventMatch = eventCompile.search(data['data'])
-   if eventMatch is None:
-       sentence = data['data']
-   else:
-       eventStart = eventMatch.start()
-       sentence = data['data'][:eventStart]
    controlName = data['name']
+   sentence = data['data']
    ajaxIter = ajaxCompile.finditer(sentence)
    urlList = []
    for ajaxMatch in ajaxIter:
@@ -415,7 +410,7 @@ def findVariableFolder(theList):
     return varValue
 
 def printTotal(list):
-    listFile = open("C:/Users/ME/Documents/code/jsList3.csv", "w")
+    listFile = open("C:/Users/이재원/Documents/code/jsList3.csv", "w")
     wr = csv.writer(listFile)
     rowNum = 1
     wr.writerow([1,'jsPath','controllerId','eventId','url','app','sg','so','webControllerJs'])
@@ -424,12 +419,14 @@ def printTotal(list):
         wr.writerow([rowNum,Dic['path'],Dic['controller'],Dic['event'],Dic['url'],Dic['app'],Dic['sg'],Dic['so'],Dic['webControllerJs']])
 
 
-# "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
+# # "C:/Users/이재원/Documents/FI_TOP_1Q-feature"
 # fileList = []
-# jsFileList = search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
+# jsFileList = search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 # jsList = readJsFile(jsFileList)
 #
-# printTotal(jsList)ss
+#
+# # pprint(jsList)
+# printTotal(jsList)
 
 
 

@@ -2,6 +2,8 @@ import os
 from lxml import etree
 from io import StringIO
 from pprint import pprint
+import csv
+import utilFunc
 
 # namespace 설정
 ns = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -147,7 +149,6 @@ def findAllWidget(path):
     rootList = {}
     rootList['widgetID'] = root.get('id')
     rootList['allParentObject'] = []
-    rootList['parentObject'] = "parentObject(child)"
     rootList['path'] = pathList
     rootList['webController'] = root.get('webController')
     rootList['webControllerJs'] = root.get('webControllerJs')
@@ -157,7 +158,6 @@ def findAllWidget(path):
         if (child.get('id') != None):
             innerList['widgetID'] = child.get('id')
             innerList['allParentObject'] = allParentObject(child)
-            innerList['parentObject'] = parentObject(child)
             innerList['path'] = pathList
             innerList['webController'] = findWebController(child)
             innerList['webControllerJs'] = findWebControllerJs(child)
@@ -183,7 +183,8 @@ def findAll(path):
         if 'eventId' not in  tlfDic.keys():
             tlfDic['eventId'] = ""
         allList[number] = tlfDic
-    return allList
+    allList_noDump = utilFunc.remove_dupe_dicts(allList)
+    return allList_noDump
 
 # EventList와 Widget List를 매칭해서 tlf 리스트 생성
 def matciWidgetEvent(widgetList, eventList):
@@ -215,10 +216,19 @@ def findEvent(value, key, child):
             value = child.get(key)
     return value
 
-#Event 및 Layout List 출력
-
-# fileList = []
+def printTotal(list):
+    listFile = open("C:/Users/이재원/Documents/code/tlfList.csv", "w")
+    wr = csv.writer(listFile)
+    rowNum = 1
+    wr.writerow([1,'xmlPath','webControllerJs','webController','allParentObject','widgetID','eventID'])
+    for Dic in list:
+        rowNum = rowNum + 1
+        wr.writerow([rowNum,Dic['path'],Dic['webControllerJs'],Dic['webController'],Dic['allParentObject'],Dic['widgetID'],Dic['eventId']])
 #
-# totalList = search('C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature', fileList)
+# Event 및 Layout List 출력
+#
+# fileList = []
+
+# totalList = search('C:/Users/이재원/Documents/FI_TOP_1Q-feature')
 # allList = readTlfFile(totalList)
-# pprint(allList)
+# printTotal(allList)

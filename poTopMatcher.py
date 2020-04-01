@@ -7,6 +7,8 @@ import matcher
 import ast
 import re
 import jsParserNew
+import pprint
+import utilFunc
 
 
 
@@ -14,6 +16,28 @@ def findListFromFile(path):
     with open(path, 'r', encoding='UTF-8') as f:
         mylist = ast.literal_eval(f.read())
     return mylist
+
+def findDicFromFile(path):
+    with open(path, 'r', encoding="UTF-8") as inf:
+        allRead = inf.read()
+        dicList = []
+        tokenNum = 0
+        newData = ""
+        for i in allRead:
+            if i == '{':
+                newData = ""
+                tokenNum = tokenNum + 1
+                newData = newData + i
+            elif i == '}':
+                tokenNum = tokenNum - 1
+                newData = newData + i
+                dicList.append(newData)
+            else:
+                newData = newData + i
+        for num, value in enumerate(dicList):
+            dicData = ast.literal_eval(value)
+            dicList[num] = dicData
+        return dicList
 
 
 
@@ -67,8 +91,6 @@ def poTopMatching(poList, topList):
         if parentObjMaxLen < len(topL['parentObject']):
             parentObjMaxLen = len(topL['parentObject'])
 
-    print(poPathMaxLen)
-    print(xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 8)
     for poL in poList:
         poMatch = 0
         soNum = -1
@@ -106,7 +128,7 @@ def poTopMatching(poList, topList):
                 totalList.append(nowList)
         if poMatch == 0:
             nowList = ["" for i in range(0,xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + poPathMaxLen + 10)]
-            for i in range(0, xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + 2):
+            for i in range(0, xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + 3):
                 nowList[i] = ""
             nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + 3] = poL[0]
             nowList[xmlPathMaxLen + parentObjMaxLen + jsPathMaxLen + 4] = poL[1]
@@ -141,6 +163,138 @@ def poTopMatching(poList, topList):
             totalList.append(nowList)
     return totalList
 
+def poTopMatchingDic(poList, topList):
+    totalList = []
+    jsPathMaxLen = 0
+    poPathMaxLen = 0
+    xmlPathMaxLen = 0
+    parentObjMaxLen = 0
+
+
+    for poL in poList:
+        soNum = -1
+        soIndex = findSoIndex(poL, soNum)
+        if poPathMaxLen < (soIndex-2):
+            poPathMaxLen = soIndex-2
+    for topL in topList:
+        if xmlPathMaxLen < len(topL['xmlPath']):
+            xmlPathMaxLen = len(topL['xmlPath'])
+        if jsPathMaxLen < len(topL['jsPath']):
+            jsPathMaxLen = len(topL['jsPath'])
+        if parentObjMaxLen < len(topL['parentObject']):
+            parentObjMaxLen = len(topL['parentObject'])
+
+    for poL in poList:
+        poMatch = 0
+        soNum = -1
+        for topL in topList:
+            if topL['app'] == poL['APPLICATION_NAME'] and topL['sg'] == poL['SERVICEGROUP_NAME'] and topL['so'] == exchangeSoName(poL):
+                nowDic = {}
+                poMatch = poMatch + 1
+                inputListToDic(topL, 'xmlPath', nowDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
+                inputListToDic(topL, 'parentObject', nowDic, 'PARENT_OBJECT_DEPTH', parentObjMaxLen)
+                nowDic['WIDGET_NAME'] = topL['widget']
+                nowDic['CONTROLLER_NAME'] = topL['controller']
+                nowDic['EVENT_NAME'] = topL['event']
+                inputListToDic(topL, 'jsPath', nowDic, 'JS_PATH_DEPTH', jsPathMaxLen)
+                nowDic['APPLICATION_NAME'] = topL['app']
+                nowDic['SERVICEGROUP_NAME'] = topL['sg']
+                nowDic['SO_NAME'] = topL['so']
+                nowDic['META'] = poL['META']
+                for i in range(0,6):
+                    if 'DEPTH ' + str(i) in poL.keys():
+                        nowDic['DEPTH ' + str(i)] = poL['DEPTH ' + str(i)]
+                inputPoValue(poL, 'BO_NAME', nowDic, 'BO_NAME')
+                inputPoValue(poL, 'METHOD_NAME', nowDic, 'METHOD_NAME')
+                inputPoValue(poL, 'DOF_NAME', nowDic, 'DOF_NAME')
+                inputPoValue(poL, 'QUERY_NAME', nowDic, 'QUERY_NAME')
+                inputPoValue(poL, 'QUERY', nowDic, 'QUERY')
+                inputPoValue(poL, 'SCHEMA', nowDic, 'SCHEMA')
+                inputPoValue(poL, 'TABLE', nowDic, 'TABLE')
+                inputPoValue(poL, 'COLUMN', nowDic, 'COLUMN')
+                nowDic['TOP_MATCHING'] = topL['matching']
+                nowDic['TOP_PO_MATCHING'] = "Y"
+                totalList.append(nowDic)
+        if poMatch == 0:
+            nowDic = {}
+            inputBlankToDic(nowDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
+            inputBlankToDic(nowDic, 'PARENT_OBJECT_DEPTH', parentObjMaxLen)
+            nowDic['WIDGET_NAME'] = ""
+            nowDic['CONTROLLER_NAME'] = ""
+            nowDic['EVENT_NAME'] = ""
+            inputBlankToDic(nowDic, 'JS_PATH_DEPTH', jsPathMaxLen)
+            nowDic['APPLICATION_NAME'] = poL['APPLICATION_NAME']
+            nowDic['SERVICEGROUP_NAME'] = poL['SERVICEGROUP_NAME']
+            nowDic['SO_NAME'] = poL['SO_NAME']
+            nowDic['META'] = poL['META']
+            for i in range(0, 6):
+                if 'DEPTH ' + str(i) in poL.keys():
+                    nowDic['DEPTH ' + str(i)] = poL['DEPTH ' + str(i)]
+            inputPoValue(poL,'BO_NAME', nowDic, 'BO_NAME')
+            inputPoValue(poL, 'METHOD_NAME', nowDic, 'METHOD_NAME')
+            inputPoValue(poL, 'DOF_NAME', nowDic, 'DOF_NAME')
+            inputPoValue(poL, 'QUERY_NAME', nowDic, 'QUERY_NAME')
+            inputPoValue(poL, 'QUERY', nowDic, 'QUERY')
+            inputPoValue(poL, 'SCHEMA', nowDic, 'SCHEMA')
+            inputPoValue(poL, 'TABLE', nowDic, 'TABLE')
+            inputPoValue(poL, 'COLUMN', nowDic, 'COLUMN')
+            nowDic['TOP_MATCHING'] = "N"
+            nowDic['TOP_PO_MATCHING'] = "N"
+            totalList.append(nowDic)
+
+    for topL in topList:
+        topMatch = 0
+        for poL in poList:
+            soNum = -1
+            soIndex = findSoIndex(poL, soNum)
+            if topL['app'] == poL['APPLICATION_NAME'] and topL['sg'] == poL['SERVICEGROUP_NAME'] and topL['so'] == exchangeSoName(poL):
+                topMatch = topMatch + 1
+        if topMatch == 0:
+            nowDic = {}
+            inputListToDic(topL, 'xmlPath', nowDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
+            inputListToDic(topL, 'parentObject', nowDic, 'PARENT_OBJECT_DEPTH', parentObjMaxLen)
+            nowDic['WIDGET_NAME'] = topL['widget']
+            nowDic['CONTROLLER_NAME'] = topL['controller']
+            nowDic['EVENT_NAME'] = topL['event']
+            inputListToDic(topL, 'jsPath', nowDic, 'JS_PATH_DEPTH', jsPathMaxLen)
+            nowDic['APPLICATION_NAME'] = topL['app']
+            nowDic['SERVICEGROUP_NAME'] = topL['sg']
+            nowDic['SO_NAME'] = topL['so']
+            nowDic['META'] = ""
+            for i in range(0, 6):
+                nowDic['DEPTH ' + str(i)] = ""
+            nowDic['BO_NAME'] = ""
+            nowDic['METHOD_NAME'] = ""
+            nowDic['DOF_NAME'] = ""
+            nowDic['QUERY_NAME'] = ""
+            nowDic['QUERY'] = ""
+            nowDic['SCHEMA'] = ""
+            nowDic['TABLE'] = ""
+            nowDic['COLUMN'] = ""
+            nowDic['TOP_MATCHING'] = topL['matching']
+            nowDic['TOP_PO_MATCHING'] = "N"
+            totalList.append(nowDic)
+    totalList = utilFunc.remove_dupe_dicts(totalList)
+    return totalList
+
+def inputPoValue(list, value, totalDic, key):
+    if value in list.keys():
+        totalDic[key] = list[value]
+    else:
+        totalDic[key] = ""
+
+def inputListToDic(list, value, totalDic, key, maxLen):
+    for i in range(1, maxLen+1):
+        if i < len(list[value]):
+            totalDic[key + str(i)] = list[value][i-1]
+        else:
+            totalDic[key + str(i)] = ""
+
+def inputBlankToDic(totalDic, key, maxLen):
+    for i in range(1, maxLen+1):
+        totalDic[key + str(i)] = ""
+
+
 def inputListToTotal(list, value, totalList, startIndex, lastIndex):
     lenList = len(list)
     for num, val in enumerate(list[value]):
@@ -151,11 +305,8 @@ def inputPoListToTotal(list, totalList, startNum, lastNum, startIndex, lastIndex
     for num, val in enumerate(list[startNum: lastNum+1]):
         totalList[startIndex + num] = val
 
-def exchangeSoName(poL, soIndex):
-    soVal = poL[soIndex]
-    soCompile = re.compile('SO[_]NAME\s?:\s?')
-    soLast = soCompile.search(soVal).end()
-    soName = soVal[soLast:]
+def exchangeSoName(poL):
+    soName = poL['SO_NAME']
     lenSo = len(soName)
     if soName[lenSo-1] != "O" or soName[lenSo-2] != "S":
         soName = soName + "S" + "O"
@@ -181,16 +332,26 @@ def printTotal(list):
         wr.writerow(inputList)
     listFile.close()
 
+def printTotalDic(list):
+    csv_columns = list[2].keys()
+    with open("C:/Users/이재원/Documents/code/poTopMatchingDic.csv", 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+        writer.writeheader()
+        for data in list:
+            writer.writerow(data)
+
+
 jsFileList = jsParserNew.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 jsList = jsParserNew.readJsFile(jsFileList)
+
 
 xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 xmlList = xmlParser.readTlfFile(xmlFileList)
 
 topList = matcher.matchXmlAndJs(xmlList, jsList)
 
-poList = findListFromFile('C:/Users/이재원/Documents/code/PoParserOutput.txt')
+poList = findDicFromFile('C:/Users/이재원/Documents/code/Sodict.txt')
 
-totalList = poTopMatching(poList, topList)
+totalList = poTopMatchingDic(poList, topList)
 
-printTotal(totalList)
+printTotalDic(totalList)
