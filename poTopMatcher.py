@@ -341,17 +341,17 @@ def printTotalDic(list):
             writer.writerow(data)
 
 
-jsFileList = jsParserNew.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
-jsList = jsParserNew.readJsFile(jsFileList)
-
-
-xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
-xmlList = xmlParser.readTlfFile(xmlFileList)
-
-topList = matcher.matchXmlAndJs(xmlList, jsList)
-
-poList = findDicFromFile('C:/Users/이재원/Documents/code/Sodict.txt')
-
-totalList = poTopMatchingDic(poList, topList)
-
-printTotalDic(totalList)
+# jsFileList = jsParserNew.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+# jsList = jsParserNew.readJsFile(jsFileList)
+#
+#
+# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+# xmlList = xmlParser.readTlfFile(xmlFileList)
+#
+# topList = matcher.matchXmlAndJs(xmlList, jsList)
+#
+# poList = findDicFromFile('C:/Users/이재원/Documents/code/Sodict.txt')
+#
+# totalList = poTopMatchingDic(poList, topList)
+#
+# printTotalDic(totalList)
