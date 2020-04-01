@@ -35,8 +35,8 @@ while True: # line by line으로 읽어내리는 while문
         # 컬럼명과 컬럼 타입을 아웃풋 리스트에 어펜드
 
       if (line == ');\n') or not line: # CREATE TABLE 쿼리가 끝나면 
-        ERDdict["Table"] = table_name # ERDdict에 테이블 이름과 컬럼명을 담음
-        ERDdict["Column"] = columnList_name
+        ERDdict["TABLE"] = table_name # ERDdict에 테이블 이름과 컬럼명을 담음
+        ERDdict["COLUMN"] = columnList_name
         
         List.append(ERDdict) # 딕셔너리를 출력 리스트에 어펜드
         break # CREATE TABLE이 끝나거나 파일 끝까지 읽었으니 while문 종료
