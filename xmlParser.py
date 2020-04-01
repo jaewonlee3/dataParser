@@ -165,21 +165,14 @@ def findAllWidget(path):
     return listWidget
 
 # 폴더에서 거기 하위폴더들에 있는 tlf파일을 다 찾아줌
-def search(dirname,fileList):
-    try:
-        filenames = os.listdir(dirname)
-        for filename in filenames:
-            full_filename = os.path.join(dirname, filename)
-            if os.path.isdir(full_filename):
-                search(full_filename, fileList)
-            else:
-                ext = os.path.splitext(full_filename)[-1]
-                if ext == '.tlf':
-                    fileList.append(full_filename)
-    except PermissionError:
-        pass
-    finally:
-        return fileList
+def search(folder):
+    tlfFileList = []
+    for (path, dir, files) in os.walk(folder):
+        for filename in files:
+            ext = os.path.splitext(filename)[-1]
+            if ext == '.tlf':
+                tlfFileList.append("%s/%s" % (path, filename))
+    return tlfFileList
 
 # 파일 위치를 찾아와서 전체 리스트를 읽어옴
 def findAll(path):

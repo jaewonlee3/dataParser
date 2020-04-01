@@ -6,6 +6,7 @@ import SO파싱
 import matcher
 import ast
 import re
+import jsParserNew
 
 
 
@@ -28,14 +29,14 @@ def poTopMatchingMain(poPath, topPath):
     UserPath = SO파싱.input('servicegroup.xml 경로를 입력해 주세요 : ')
     SO파싱.PoParser(UserPath)
 
-    fileList = []
-    jsFileList = jsParser.search(topPath, fileList)
 
-    jsList = jsParser.readJsFile(jsFileList)
+    jsFileList = jsParserNew.search(topPath)
+
+    jsList = jsParserNew.readJsFile(jsFileList)
 
     tlfFileList = []
 
-    xmlFileList = xmlParser.search(topPath, tlfFileList)
+    xmlFileList = xmlParser.search(topPath)
     xmlList = xmlParser.readTlfFile(xmlFileList)
 
     topList = matcher.matchXmlAndJs(xmlList, jsList)
@@ -180,12 +181,10 @@ def printTotal(list):
         wr.writerow(inputList)
     listFile.close()
 
-jsList = []
-jsFileList = jsParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature",jsList)
-jsList = jsParser.readJsFile(jsFileList, "C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+jsFileList = jsParserNew.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
+jsList = jsParserNew.readJsFile(jsFileList)
 
-tlfList = []
-xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature",tlfList)
+xmlFileList = xmlParser.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 xmlList = xmlParser.readTlfFile(xmlFileList)
 
 topList = matcher.matchXmlAndJs(xmlList, jsList)

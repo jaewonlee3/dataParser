@@ -83,7 +83,6 @@ def matchXmlAndJs(xmlList, jsList):
             totalDic['so'] = jsDic['so']
             totalDic['matching'] = "N"
             totalList.append(totalDic)
-    pprint(totalList)
     return totalList
 
 # 리스트에 있는 것을 csv 형태의 파일로 출력
@@ -113,14 +112,13 @@ def inputValueFormal(totalDic, jsDic, xmlDic, totalList):
     totalDic['matching'] = "Y"
     totalList.append(totalDic)
 
-# fileList = []
-# jsFileList = jsParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", fileList)
+# jsFileList = jsParserNew.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
 #
-# jsList = jsParser.readJsFile(jsFileList)
+# jsList = jsParserNew.readJsFile(jsFileList)
 #
 # tlfFileList = []
 #
-# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", tlfFileList)
+# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
 # xmlList = xmlParser.readTlfFile(xmlFileList)
 #
 # kk = matchXmlAndJs(xmlList, jsList)
