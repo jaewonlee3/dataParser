@@ -274,7 +274,6 @@ def poTopMatchingDic(poList, topList):
             nowDic['TOP_MATCHING'] = topL['matching']
             nowDic['TOP_PO_MATCHING'] = "N"
             totalList.append(nowDic)
-    totalList = utilFunc.remove_dupe_dicts(totalList)
     return totalList
 
 def inputPoValue(list, value, totalDic, key):

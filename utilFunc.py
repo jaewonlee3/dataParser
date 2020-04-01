@@ -66,7 +66,7 @@ def delAnnotation(allLine):
 
 # 겹치는 리스트들을 제거해줌
 def remove_dupe_dicts(l):
-  list_of_strings = [json.dumps(d, sort_keys=True) for d in l ]
+  list_of_strings = [json.dumps(d, sort_keys=True) for d in l]
   list_of_strings = set(list_of_strings)
   return [json.loads(s)for s in list_of_strings]
 
