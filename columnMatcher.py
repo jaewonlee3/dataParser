@@ -19,9 +19,13 @@ def matchQueryandERD(totalList,ERDList):
             if tableName in table['TABLE']:
                 if columnName in table['COLUMN']:
                     row["QUERY2ERD"] = "Y"
+                    matching = 1
                     break
-            else:
-                row["QUERY2ERD"] = "N"
+                else:
+                    matching = 1
+                    row["QUERY2ERD"] = "N"
+        if matched == 0:
+            row["QUERY2ERD"] = "N"
     return totalList
 
     
