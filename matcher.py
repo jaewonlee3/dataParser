@@ -116,13 +116,13 @@ def inputValueFormal(totalDic, jsDic, xmlDic):
 
 
 
-jsFileList = jsParserNew.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
-
-jsList = jsParserNew.readJsFile(jsFileList)
-
-xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
-xmlList = xmlParser.readTlfFile(xmlFileList)
-
-
-kk = matchXmlAndJs(xmlList, jsList)
-printTotal(kk)
+# jsFileList = jsParserNew.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
+#
+# jsList = jsParserNew.readJsFile(jsFileList)
+#
+# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
+# xmlList = xmlParser.readTlfFile(xmlFileList)
+#
+#
+# kk = matchXmlAndJs(xmlList, jsList)
+# printTotal(kk)
