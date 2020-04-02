@@ -1,5 +1,6 @@
 import os
 import git
+import json
 
 
 
@@ -23,17 +24,19 @@ def PathSearch(AppName, SgName) :
     file_list_py = [file for file in file_list if file.endswith("servicegroup.xml")]
     fileNumber = len(file_list_py)
     if (fileNumber != 1) :
-        print("서비스그룹이 지정된 경로에 있지 않습니다. PO 빌드가 제대로 되었는지 확인해 주세요.")
+        error = "서비스그룹이 지정된 경로에 있지 않습니다. PO 빌드가 제대로 되었는지 확인해 주세요."
+        return error
     else :
         SgPath = os.path.join(path, file_list_py[0])
         return SgPath
 
-if __name__ == "__main__" :
-    AppName = input("Application Name : ")
-    SgName = input("Service Group Name : ")
-    GitPullUse = input("최신branch로 pull 하시겠습니까? :(Y/N) ")
+def POconnector(AppName, SgName) :
+    GitPull(AppName, SgName)
+    Output = PathSearch(AppName, SgName)
+    return Output
+    
+    #GitPull(AppName, SgName)
+    #SgPath = PathSearch(AppName, SgName)
+    #print(SgPath)
 
-    if (GitPullUse == "Y") :
-        GitPull(AppName, SgName)
-    SgPath = PathSearch(AppName, SgName)
-    print(SgPath)
+
