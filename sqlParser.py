@@ -4,6 +4,13 @@ import sqlparse
 from array import *
 
 class RecursiveTokenParser(object):
+
+
+    #__init__
+    #Input:
+    #   query: SQL query문을 입력으로 받는다
+    #Output:
+    #   stmt: query문을 token화 한 내용
     def __init__(self, query):
         self.query = query
         self.names = []
@@ -11,7 +18,9 @@ class RecursiveTokenParser(object):
         self.stmt = self.elements[0]
         self.info = []
         self.parsedToken = []
-        self.DML = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+        # self.DML = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+
+
 
     def extractColumn(self):
         #query type을 가져오는 함수 -> tokenReport에서 query type에 따라 처리방식 결정
@@ -21,6 +30,44 @@ class RecursiveTokenParser(object):
         for token in self.stmt.tokens:
             self.parseToken(token)
         return self.tokenReport(query_type, self.parsedToken)
+
+
+
+    #입력된 query의 모든 token을 Recursive하게 찾음
+    #token에는 subtoken이 존재한는 경우가 있음
+    #   token화한 query는 어려개의 token 형태로 저장됨
+    #   token.keyword: AS, FROM, WHERE 같은 SQL에 사용되는 Keyword
+    #   token.whitespace: 빈칸들 (스페이스)
+    #   token.identifier/identifierList: db 정보(컬럼 이름, 테이블 이름)
+    #   token.comparison: 정보를 비교하는 token (예: B = 1)
+    #   모든 token들은 많은 정보를 답고있고, subtoken으로 담고있음
+    #       예: token.comparison: 'B=1'
+    #           ㄴ> token.comparsions.tokens (sub token):
+    #               ㄴ> token.identifier: B
+    #               ㄴ> token.comparison: =
+    #               ㄴ> token.identifier: 1
+    #subtoken이 존재하지 않은 경우가까지 Recursive하게 찾아줌
+    #Input:
+    #   token: extractColumn에서 한번 token화 한 query statment의 하나의 token
+    #Output:
+    #   parsedToken: query statment의 전체 token List
+    def parseToken(self, token):
+        # if token.ttype == "Token.Keyword":
+        tokentype = str(token.ttype)
+
+        if hasattr(token, 'tokens'):
+            for subtoken in token.tokens:
+                #is_whitespace == FALSE -> query안의 빈칸들은 의미가 없음
+                #hasattr(subtoken 'tokens') == FALSE -> token의 leaf에 도달했을
+                #경우에만 append. leaf가 아닐경우에는 해당 token을 다시 parseToken
+                if subtoken.is_whitespace == False and hasattr(subtoken, 'tokens') == False and str(token.ttype != "Token.Keyword"):
+                    self.parsedToken.append(str(subtoken).upper())
+                else: self.parseToken(subtoken)
+        #첨부터 token이 leaf token인 경우 keyword token만 저장
+        #keyword가 아닌 token은 다른 subtoken안에 존재함
+        elif str(token.ttype) == "Token.Keyword":
+            self.parsedToken.append(str(token))
+
 
 
     #Query Analyser
@@ -152,20 +199,20 @@ class RecursiveTokenParser(object):
                 #SELECT QUERY는 FROM 앞에는 select할 컬럼 내용이 존재,
                 #뒤에는 SCHEMA.TABLE 정보가 존재
                 if token == "FROM":
-                    #query시작부터 FROM 토큰까지 iter를 톨면서 . token의 인덱스에서
+                    #query시작부터 FROM token까지 iter를 톨면서 . token의 인덱스에서
                     #앞뒤 인덱스로 table(alias).column 정보 추출
                     tokenStartFrom = parsedToken[:index]
                     for subindex, token in enumerate(tokenStartFrom):
                         if token == ".":
                             columnName.append([parsedToken[subindex-1], parsedToken[subindex+1]])
                     #SELECT는 table정보를 AS를 통해 ALIAS해서 사용
-                    #FROM token부터 WHERE token까지 iter를 돌면서 "AS" 토큰
+                    #FROM token부터 WHERE token까지 iter를 돌면서 "AS" token
                     #인덱스에서 앞뒤의 인덱스들로 schema, table 정보 추출
                     tokenFromEnd = parsedToken[index:]
                     for subindex, token in enumerate(tokenFromEnd):
                         if token == "AS":
                             tableInfo.append([tokenFromEnd[subindex-3],tokenFromEnd[subindex-1],tokenFromEnd[subindex+1]])
-                        #WHERE 토큰은 아래서 처리 하기때문에
+                        #WHERE token은 아래서 처리 하기때문에
                         #첫 WHERE가 나오면 break
                         elif token == "WHERE":
                             break
@@ -197,31 +244,6 @@ class RecursiveTokenParser(object):
                     self.info.append([tokenReport.tableInfo[0],tokenReport.tableInfo[1],column[0]])
 
             return self.info
-
-
-
-
-    #입력된 query의 모든 token을 Recursive하게 찾음
-    #token에는 subtoken이 존재한는 경우가 있음
-    #subtoken이 존재하지 않은 경우가까지 Recursibe하게 찾아줌
-    #Input:
-    #   token: extractColumn에서 한번 token화 한 query statment의 하나의 토큰
-    #Output:
-    #   parsedToken: query statment의 전체 token List
-    def parseToken(self, token):
-        # if token.ttype == "Token.Keyword":
-        tokentype = str(token.ttype)
-
-        if hasattr(token, 'tokens'):
-            for subtoken in token.tokens:
-                #is_whitespace == FALSE -> query안의 빈칸들은 의미가 없음
-                #hasattr(subtoken 'tokens') == FALSE -> token의 leaf에 도달했을
-                #경우에만 append. leaf가 아닐경우에는 해당 token을 다시 parseToken
-                if subtoken.is_whitespace == False and hasattr(subtoken, 'tokens') == False and str(token.ttype != "Token.Keyword"):
-                    self.parsedToken.append(str(subtoken).upper())
-                else: self.parseToken(subtoken)
-        elif str(token.ttype) == "Token.Keyword":
-            self.parsedToken.append(str(token))
 
 
 # sqlInsert = "INSERT INTO SCHEMA1.TABLE1 (A, B, C, D, E, F, G) VALUES (1,2,3,4,5,6,7);"
