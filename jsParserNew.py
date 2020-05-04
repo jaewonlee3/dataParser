@@ -722,5 +722,5 @@ def dataExclFunc(sentence):
 
 
 # appVar = inputVariable("/Users/이재원/Documents/code/variables.js")
-#
+
 # jsFile.close();
