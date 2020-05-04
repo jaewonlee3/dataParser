@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ebb51867-8065-4877-9e76-b1072720f364" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jsParserNew.py" beforeDir="false" afterPath="$PROJECT_DIR$/jsParserNew.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/matcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/matcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poTopMatcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/poTopMatcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilFunc.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilFunc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xmlParser.py" beforeDir="false" afterPath="$PROJECT_DIR$/xmlParser.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -238,11 +231,11 @@
     </state>
     <state x="461" y="222" key="SettingsEditor/0.0.1920.1160/1920.5.1920.1160@0.0.1920.1160" timestamp="1585800094269" />
     <state x="2381" y="227" key="SettingsEditor/0.0.1920.1160/1920.5.1920.1160@1920.5.1920.1160" timestamp="1587716153879" />
-    <state x="652" y="404" key="com.intellij.ide.util.TipDialog" timestamp="1587968683229">
-      <screen x="0" y="0" width="1920" height="1160" />
+    <state x="2572" y="409" key="com.intellij.ide.util.TipDialog" timestamp="1588592254886">
+      <screen x="1920" y="5" width="1920" height="1160" />
     </state>
     <state x="652" y="404" key="com.intellij.ide.util.TipDialog/0.0.1920.1160/1920.5.1920.1160@0.0.1920.1160" timestamp="1587968683229" />
-    <state x="2572" y="409" key="com.intellij.ide.util.TipDialog/0.0.1920.1160/1920.5.1920.1160@1920.5.1920.1160" timestamp="1587532326955" />
+    <state x="2572" y="409" key="com.intellij.ide.util.TipDialog/0.0.1920.1160/1920.5.1920.1160@1920.5.1920.1160" timestamp="1588592254886" />
     <state x="213" y="5" width="1446" height="1160" key="dock-window-1" timestamp="1587968716869">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
