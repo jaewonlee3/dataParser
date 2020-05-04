@@ -17,6 +17,16 @@ def matchXmlAndJs(xmlList, jsList):
     # 전체 리스트 담을 곳
     totalList = []
     # xmlList와 jsList의 결과물들을 하나씩 뽑아와서 비교
+    xmlPathMaxLen = 0
+    jsPathMaxLen = 0
+
+    for xmlDic in xmlList:
+        if xmlPathMaxLen < len(xmlDic['path']):
+            xmlPathMaxLen = len(xmlDic['path'])
+    for jsDic in jsList:
+        if jsPathMaxLen < len(jsDic['path']):
+            jsPathMaxLen = len(jsDic['path'])
+
 
     for xmlDic in xmlList:
         # jsList와 매칭된 xml리스트와 매칭되지 않은 xml리스트 구분용
@@ -28,31 +38,31 @@ def matchXmlAndJs(xmlList, jsList):
                 if jsDic['controller'] == xmlDic['widgetID']:
                     totalDic = {}
                     xmlMatch = xmlMatch + 1
-                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic)
+                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic, xmlPathMaxLen, jsPathMaxLen)
                     totalList.append(totalDic)
             # tlf의 webController와 js쪽의 controller가 같거나 tlf의 webControllerJs와 js의 path가 같고, tlf의 event와 js의 event가 같아야함
             elif xmlDic['webController'] == jsDic['controller'] or xmlDic['webControllerJs'] == jsDic['webControllerJs']:
                 if xmlDic['eventId'] == jsDic['event'] and jsDic != 'onWidgetAttach':
                     totalDic = {}
                     xmlMatch = xmlMatch + 1
-                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic)
+                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic, xmlPathMaxLen, jsPathMaxLen)
                     totalList.append(totalDic)
             # tlf쪽과 js쪽의 event 이름이 가트며, event가 global event
             elif xmlDic['eventId'] == jsDic['event']:
                 if jsDic['controller'] == 'FStop3062Logic' or jsDic['controller'] == 'FI_1Q_TOPLogic':
                     totalDic = {}
                     xmlMatch = xmlMatch + 1
-                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic)
+                    totalDic = inputValueFormal(totalDic, jsDic, xmlDic, xmlPathMaxLen, jsPathMaxLen)
                     totalList.append(totalDic)
         # js와 매칭되지 않은 tlf쪽의 리스트들을 넣어줌
         if xmlMatch == 0:
             totalDic = {}
-            totalDic['xmlPath'] = xmlDic['path']
-            totalDic['parentObject'] = xmlDic['allParentObject']
+            inputListToDic(xmlDic, 'path', totalDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
+            totalDic['parentObject'] = xmlDic['parentObject']
             totalDic['widget'] = xmlDic['widgetID']
             totalDic['controller'] = xmlDic['webController']
             totalDic['event'] = xmlDic['eventId']
-            totalDic['jsPath'] = []
+            inputBlankToDic(totalDic, 'JS_PATH_DEPTH', jsPathMaxLen)
             totalDic['url'] =""
             totalDic['app'] =""
             totalDic['sg'] = ""
@@ -75,12 +85,12 @@ def matchXmlAndJs(xmlList, jsList):
         # tlf와 매칭되지 않은 js쪽의 리스트들을 넣어줌
         if jsMatch == 0:
             totalDic = {}
-            totalDic['xmlPath'] = ""
+            inputBlankToDic(totalDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
             totalDic['parentObject'] = []
             totalDic['widget'] = ""
             totalDic['controller'] = jsDic['controller']
             totalDic['event'] = jsDic['event']
-            totalDic['jsPath'] = jsDic['path']
+            inputListToDic(jsDic, 'path', totalDic, 'JS_PATH_DEPTH', jsPathMaxLen)
             totalDic['url'] = jsDic['url']
             totalDic['app'] = jsDic['app']
             totalDic['sg'] = jsDic['sg']
@@ -94,19 +104,22 @@ def matchXmlAndJs(xmlList, jsList):
 # output: 매칭된 결과 파일
 def printTotal(list):
     csv_columns = list[2].keys()
-    with open("C:/Users/이재원/Documents/code/matchingFile3.csv", 'w') as csvfile:
+    with open("C:/Users/이재원/Documents/code/TOPMatcher.csv", 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
         writer.writeheader()
         for data in list:
             writer.writerow(data)
 
-def inputValueFormal(totalDic, jsDic, xmlDic):
-    totalDic['xmlPath'] = xmlDic['path']
-    totalDic['parentObject'] = xmlDic['allParentObject']
+# input: 전체 딕셔너리, js딕셔너리, xml 딕셔너리
+# output: js딕셔너리와 xml딕셔너리의 정보를 담은 전체 딕셔너리
+# xmlDic과 jsDic의 값을 total Dic에 투여할것
+def inputValueFormal(totalDic, jsDic, xmlDic, xmlPathMaxLen, jsPathMaxLen):
+    inputListToDic(xmlDic, 'path', totalDic, 'XML_PATH_DEPTH', xmlPathMaxLen)
+    totalDic['parentObject'] = xmlDic['parentObject']
     totalDic['widget'] = xmlDic['widgetID']
     totalDic['controller'] = jsDic['controller']
     totalDic['event'] = jsDic['event']
-    totalDic['jsPath'] = jsDic['path']
+    inputListToDic(jsDic, 'path', totalDic, 'JS_PATH_DEPTH', jsPathMaxLen)
     totalDic['url'] = jsDic['url']
     totalDic['app'] = jsDic['app']
     totalDic['sg'] = jsDic['sg']
@@ -114,14 +127,23 @@ def inputValueFormal(totalDic, jsDic, xmlDic):
     totalDic['matching'] = "Y"
     return totalDic
 
+def inputListToDic(list, value, totalDic, key, maxLen):
+    for i in range(1, maxLen+1):
+        if i < len(list[value]):
+            totalDic[key + str(i)] = list[value][i-1]
+        else:
+            totalDic[key + str(i)] = ""
 
+def inputBlankToDic(totalDic, key, maxLen):
+    for i in range(1, maxLen+1):
+        totalDic[key + str(i)] = ""
 
-# jsFileList = jsParserNew.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
-#
-# jsList = jsParserNew.readJsFile(jsFileList)
-#
-# xmlFileList = xmlParser.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature")
-# xmlList = xmlParser.readTlfFile(xmlFileList)
+jsFileList = utilFunc.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", ".js")
+
+jsList = jsParserNew.readJsFile(jsFileList)
+
+xmlFileList = utilFunc.search("C:/Users/이재원/Documents/fsCode/FI_TOP_1Q-feature", ".tlf")
+xmlList = xmlParser.readTlfFile(xmlFileList)
 
 
 kk = matchXmlAndJs(xmlList, jsList)

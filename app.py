@@ -152,6 +152,104 @@ def columnERDmatcher() :
     outputdto["ERDlist"] = ""
     return output
 
+@app.route("/untilTOPMatching", methods=['POST'])
+def untilTOPMatcher() :
+    input = request.get_json()
+    inputDto = input["dto"]
+    AppName = inputDto["APPLICATION_NAME"]
+    path = TOP_CONNECTOR.TopXmlConnector(AppName)
+    xmlFileList = xmlParser.search(path)
+    jsFileList = jsParserNew.search(path)
+    xmlList = xmlParser.readTlfFile(xmlFileList)
+    jsList = jsParserNew.readJsFile(jsFileList)
+    totalList = matcher.matchXmlAndJs(xmlList, jsList)
+    output = {}
+    outputDto = {}
+    outputDto["totalList"] = totalList
+    output["dto"] = outputDto
+    return output
+
+@app.route("/untilPOParser", methods=['POST'])
+def untilPOParser():
+    input =request.get_json()
+    inputDto = input["dto"]
+    AppName = inputDto["APPLICATION_NAME"]
+    SgName = inputDto["SERVICEGROUP_NAME"]
+    path = PO_CONNECTOR.POconnector(AppName, SgName)
+    poList = SOparser.PoParser(path)
+    output = {}
+    outputDto = {}
+    outputDto["poList"] = poList
+    output["dto"] = outputDto
+    return output
+
+
+
+@app.route("/untilDBParser", methods=['POST'])
+def untilDBParser():
+    input = request.get_json()
+    inputDto = input["dto"]
+    ip = inputDto["IP"]
+    user = inputDto["USER"]
+    password = inputDto["PASSWORD"]
+    dbList = DBParser.DBConn(ip, user, password)
+    output = {}
+    outputDto = {}
+    outputDto["dbList"] = dbList
+    output["dto"] = outputDto
+    return output
+
+
+
+@app.route("/untilTOPPOMatching", methods=['POST'])
+def untilTOPPOMatcher():
+    input = request.get_json()
+    inputDto = input["dto"]
+    AppName = inputDto["APPLICATION_NAME"]
+    SgName = inputDto["SERVICEGROUP_NAME"]
+    topPath = TOP_CONNECTOR.TopXmlConnector(AppName)
+    poPath = PO_CONNECTOR.POconnector(AppName, SgName)
+    xmlFileList = xmlParser.search(topPath)
+    jsFileList = jsParserNew.search(topPath)
+    xmlList = xmlParser.readTlfFile(xmlFileList)
+    jsList = jsParserNew.readJsFile(jsFileList)
+    topList = matcher.matchXmlAndJs(xmlList, jsList)
+    poList = SOparser.PoParser(poPath)
+    topPoList = poTopMatcher.poTopMatchingDic(poList, topList)
+    output = {}
+    outputDto = {}
+    outputDto["topPOMatch"] = topPoList
+    output["dto"] = outputDto
+    return output
+
+@app.route("/allMatching", methods=['POST'])
+def allMatching():
+    input = request.get_json()
+    inputDto = input["dto"]
+    AppName = inputDto["APPLICATION_NAME"]
+    SgName = inputDto["SERVICEGROUP_NAME"]
+    ip = inputDto["IP"]
+    user = inputDto["USER"]
+    password = inputDto["PASSWORD"]
+    topPath = TOP_CONNECTOR.TopXmlConnector(AppName)
+    poPath = PO_CONNECTOR.POconnector(AppName, SgName)
+    xmlFileList = xmlParser.search(topPath)
+    jsFileList = jsParserNew.search(topPath)
+    xmlList = xmlParser.readTlfFile(xmlFileList)
+    jsList = jsParserNew.readJsFile(jsFileList)
+    topList = matcher.matchXmlAndJs(xmlList, jsList)
+    poList = SOparser.PoParser(poPath)
+    topPoList = poTopMatcher.poTopMatchingDic(poList, topList)
+    dbConnection = DBParser.DBConn(ip, user, password)
+    dbList = DBParser.DBParser(dbConnection)
+    totalList = columnMatcher.matchQueryandDB(topPoList, dbList)
+    output = {}
+    outputDto = {}
+    outputDto["totalMatch"] = totalList
+    output["dto"] = outputDto
+    return output
+
+
 if __name__ == "__main__" :
     app.config["JSON_SORT_KEYS"]=False
     app.run(host='0.0.0.0')

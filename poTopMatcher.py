@@ -2,7 +2,7 @@ import os
 import csv
 import xmlParser
 import jsParser
-# import SO파싱
+import SOparser
 import matcher
 import ast
 import re
@@ -48,10 +48,10 @@ def poTopMatchingMain(poPath, topPath):
     totalList = []
     poOutputFile = open(poPath,'r')
     poOutput = poOutputFile.read()
-    poList = SO파싱.QueryLists
-    querys = SO파싱.Querys
-    UserPath = SO파싱.input('servicegroup.xml 경로를 입력해 주세요 : ')
-    SO파싱.PoParser(UserPath)
+    poList = SOparser.QueryLists
+    querys = SOparser.Querys
+    UserPath = SOparser.input('servicegroup.xml 경로를 입력해 주세요 : ')
+    SOparser.PoParser(UserPath)
 
 
     jsFileList = jsParserNew.search(topPath)
@@ -333,12 +333,11 @@ def printTotal(list):
 
 def printTotalDic(list):
     csv_columns = list[2].keys()
-    with open("C:/Users/이재원/Documents/code/poTopMatchingDic.csv", 'w') as csvfile:
+    with open("C:/Users/이재원/Documents/code/topmatcher.csv", 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
         writer.writeheader()
         for data in list:
             writer.writerow(data)
-
 
 # jsFileList = jsParserNew.search("C:/Users/이재원/Documents/FI_TOP_1Q-feature")
 # jsList = jsParserNew.readJsFile(jsFileList)
