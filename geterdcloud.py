@@ -21,19 +21,19 @@ def getErdCloud(mail, password, app):
         print('chrome_options')
         chrome_options = webdriver.ChromeOptions()
         # 창을 띄우지 않고 크롬을 사용하는 옵션
-        # chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         # 웹페이지 오류 안나게 하는 옵션
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         # localhost에서 로드된 리소스에 대해 유효하지 않은 인증서 허용
         chrome_options.add_argument("--allow-insecure-localhost");
         # 크롬을 창을 띄우지 않고 쓰겠다.
-        # chrome_options.add_argument('headless')
+        chrome_options.add_argument('headless')
         # 윈도우 해상도를 현재 해상도에 맞춤
         chrome_options.add_argument('window-size=1920x1080')
         # 크롬이 GPU 가속을 사용하다가 버그가 일어나는 현상을 막기 위함
         chrome_options.add_argument("disable-gpu")
-        # chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+        chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
         # 크롬 드라이버의 위치 및 옵션 지정 (전체 서버에 맞게 변경 필요)
         driver = webdriver.Chrome('C:/jaewon/chromedriver_win32/chromedriver.exe', chrome_options=chrome_options)
         print('driver finished')
