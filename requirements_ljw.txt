@@ -1,5 +1,5 @@
 lxml==4.5.0
-Pygments==2.6.1
+Pygments==2.7.4
 pip==20.0.2
 pprint==0.1
 pprintjson==1.4.1
